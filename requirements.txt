@@ -6,20 +6,21 @@ streamlit>=1.31.0
 # =======================
 # ✅ UI Enhancement
 # =======================
-streamlit-option-menu>=0.3.6
 streamlit-elements>=0.1.0
+streamlit-option-menu>=0.3.6
 
 # =======================
 # ✅ Data Handling
 # =======================
-pandas>=1.5.3
 numpy>=1.23.5
+pandas>=1.5.3
 
 # =======================
 # ✅ Text Processing & NLP
 # =======================
-nltk>=3.8.1
 Sastrawi>=1.0.1
+langdetect>=1.0.9
+nltk>=3.8.1
 scikit-learn>=1.3.0
 scipy>=1.10.0
 
@@ -47,5 +48,5 @@ firebase-admin>=6.4.0
 # =======================
 # ✅ Utilities
 # =======================
-requests>=2.31.0
 pytz>=2024.1
+requests>=2.31.0
