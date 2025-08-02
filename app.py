@@ -11,7 +11,7 @@ from datetime import datetime
 import pytz
 from sklearn.model_selection import train_test_split
 from sklearn.naive_bayes import MultinomialNB
-from sklearn.metrics import classification_report, accuracy_score
+from sklearn.metrics import classification_report, accuracy_score, confusion_matrix
 from streamlit_option_menu import option_menu
 from fpdf import FPDF
 import firebase_admin
@@ -253,6 +253,28 @@ elif selected == "Evaluasi Model":
     report = classification_report(y_test, y_pred, target_names=["Non-Hoax", "Hoax"])
     st.text(report)
 
+    st.subheader("Confusion Matrix:")
+    cm = confusion_matrix(y_test, y_pred)
+    labels = ["Non-Hoax", "Hoax"]
+    z = cm
+    z_text = [[str(y) for y in x] for x in z]
+
+    fig_cm = ff.create_annotated_heatmap(
+        z,
+        x=labels,
+        y=labels,
+        annotation_text=z_text,
+        colorscale="Blues"
+    )
+
+    fig_cm.update_layout(
+        xaxis_title="Prediksi",
+        yaxis_title="Aktual",
+        title="Confusion Matrix"
+    )
+
+    st.plotly_chart(fig_cm, use_container_width=True)
+
     st.subheader("Visualisasi Prediksi:")
     df_eval = pd.DataFrame({"Actual": y_test, "Predicted": y_pred})
     df_eval["Hasil"] = np.where(df_eval["Actual"] == df_eval["Predicted"], "Benar", "Salah")
@@ -354,6 +376,7 @@ elif selected == "Info Sistem":
         st.write("IP Address:", ip_address)
     except:
         st.write("Tidak dapat mengambil informasi jaringan.")
+
 
 
 
