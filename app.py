@@ -3,6 +3,7 @@ import pandas as pd
 import numpy as np
 import os
 import plotly.express as px
+import plotly.figure_factory as ff
 import io
 import re
 import json
@@ -376,6 +377,7 @@ elif selected == "Info Sistem":
         st.write("IP Address:", ip_address)
     except:
         st.write("Tidak dapat mengambil informasi jaringan.")
+
 
 
 
