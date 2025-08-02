@@ -177,9 +177,9 @@ elif selected == "Preprocessing":
     # Tambahkan label jika belum ada
     if 'label' not in df2.columns:
         df2['label'] = 'Non-Hoax'
-        st.success("✅ Kolom `label` berhasil ditambahkan ke df2 dengan nilai default 'Non-Hoax'")
+        st.success("✅ Kolom `label` berhasil ditambahkan ke dataset Detik.com dengan nilai default 'Non-Hoax'")
     else:
-        st.info(" 1 Kolom `label` sudah ada di df2, tidak perlu ditambahkan lagi.")
+        st.info(" 1 Kolom `label` sudah ada di Detik.com, tidak perlu ditambahkan lagi.")
 
     # Tampilkan hasilnya
     st.dataframe(df2.head())
@@ -187,16 +187,16 @@ elif selected == "Preprocessing":
     st.markdown("### 2️ Pemilihan Atribut yang Digunakan")
     st.write("Atribut yang dipilih untuk digunakan dalam analisis adalah: `judul`, `narasi`, dan `label`.")
 
-    st.subheader("📄 Dataset df1 (Hoax)")
+    st.subheader("📄 Dataset Kaggle")
     st.dataframe(df1[["judul", "narasi", "label"]].head())
 
-    st.subheader("📄 Dataset df2 (Non-Hoax)")
+    st.subheader("📄 Dataset Detik.com")
     st.dataframe(df2[["Judul", "Konten", "label"]].head())
     
     st.markdown("### 3️ Penyesuaian Atribut")
     st.write("Nama-nama kolom disamakan: `Judul` → `judul`, `Isi` / `Konten` → `narasi`, dsb.")
 
-    st.markdown("### 4️ Penggabungan Dataset df1 + df2")
+    st.markdown("### 4️ Penggabungan Dataset Kaggle + Detik.com")
     st.dataframe(df[["judul", "narasi", "label"]].head(), use_container_width=True)
 
     st.markdown("### 5️ Penambahan Atribut `text` (Gabungan Judul + Narasi)")
@@ -276,3 +276,4 @@ elif selected == "Riwayat Prediksi":
         st.download_button("⬇️ Unduh Riwayat (.csv)", data=csv_data, file_name="riwayat_prediksi_firebase.csv", mime="text/csv")
     else:
         st.info("Belum ada data prediksi yang disimpan.")
+
