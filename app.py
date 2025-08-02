@@ -7,7 +7,6 @@ import io
 import re
 import json
 import uuid
-from langdetect import detect, DetectorFactory
 from datetime import datetime
 import pytz
 from sklearn.model_selection import train_test_split
@@ -22,16 +21,20 @@ from preprocessing import preprocess_text, preprocess_dataframe, load_and_clean_
 from feature_extraction import combine_text_columns, tfidf_transform
 from interpretation import configure_gemini, analyze_with_gemini
 
-st.set_page_config(page_title="Deteksi Berita Hoaks", page_icon="🔎", layout="wide")
-#agar input bahasa indonesia
-DetectorFactory.seed = 0  # agar hasil deteksi konsisten
+from langdetect import detect_langs, DetectorFactory
+DetectorFactory.seed = 0  # agar konsisten hasil
 
-def is_indonesian(text):
+def is_indonesian(text, min_prob=0.90):
     try:
-        lang = detect(text)
-        return lang == "id"
+        detections = detect_langs(text)
+        for lang in detections:
+            if lang.lang == "id" and lang.prob >= min_prob:
+                return True
+        return False
     except:
         return False
+        
+st.set_page_config(page_title="Deteksi Berita Hoaks", page_icon="🔎", layout="wide")
 
 # ✅ Konfigurasi Firebase
 firebase_cred = dict(st.secrets["FIREBASE_KEY"])
@@ -287,6 +290,7 @@ elif selected == "Riwayat Prediksi":
         st.download_button("⬇️ Unduh Riwayat (.csv)", data=csv_data, file_name="riwayat_prediksi_firebase.csv", mime="text/csv")
     else:
         st.info("Belum ada data prediksi yang disimpan.")
+
 
 
 
