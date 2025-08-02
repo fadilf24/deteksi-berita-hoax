@@ -68,8 +68,8 @@ def read_predictions_from_firebase():
 with st.sidebar:
     selected = option_menu(
         menu_title=None,
-        options=["Deteksi Hoaks", "Dataset", "Preprocessing", "Evaluasi Model", "Riwayat Prediksi"],
-        icons=["search", "folder", "tools", "bar-chart", "clock-history"],
+        options=["Deteksi Hoaks", "Dataset", "Preprocessing", "Evaluasi Model", "Riwayat Prediksi", "Info Sistem"],
+        icons=["search", "folder", "tools", "bar-chart", "clock-history", "cpu"],
         default_index=0,
         orientation="vertical"
     )
@@ -291,6 +291,26 @@ elif selected == "Riwayat Prediksi":
     else:
         st.info("Belum ada data prediksi yang disimpan.")
 
+elif selected == "Info Sistem":
+    import platform
+    import psutil
+
+    st.subheader("💻 Informasi Sistem (Streamlit Cloud)")
+
+    st.markdown("### 🧠 CPU dan Memori")
+    cpu_count = psutil.cpu_count(logical=True)
+    ram_total = psutil.virtual_memory().total / (1024 ** 3)
+    ram_available = psutil.virtual_memory().available / (1024 ** 3)
+
+    st.write(f"Jumlah CPU Logical: **{cpu_count}**")
+    st.write(f"Total RAM: **{ram_total:.2f} GB**")
+    st.write(f"RAM Tersedia: **{ram_available:.2f} GB**")
+
+    st.markdown("### 🛠️ Sistem Operasi")
+    st.write("Platform:", platform.system())
+    st.write("Versi:", platform.version())
+    st.write("Arsitektur:", platform.machine())
+    st.write("Prosesor:", platform.processor())
 
 
 
