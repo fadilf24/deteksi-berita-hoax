@@ -7,6 +7,7 @@ import io
 import re
 import json
 import uuid
+from langdetect import detect, DetectorFactory
 from datetime import datetime
 import pytz
 from sklearn.model_selection import train_test_split
@@ -22,6 +23,15 @@ from feature_extraction import combine_text_columns, tfidf_transform
 from interpretation import configure_gemini, analyze_with_gemini
 
 st.set_page_config(page_title="Deteksi Berita Hoaks", page_icon="🔎", layout="wide")
+#agar input bahasa indonesia
+DetectorFactory.seed = 0  # agar hasil deteksi konsisten
+
+def is_indonesian(text):
+    try:
+        lang = detect(text)
+        return lang == "id"
+    except:
+        return False
 
 # ✅ Konfigurasi Firebase
 firebase_cred = dict(st.secrets["FIREBASE_KEY"])
@@ -112,7 +122,8 @@ if selected == "Deteksi Hoaks":
             st.warning("Teks tidak boleh kosong.")
         elif not is_valid_text(user_input):
             st.warning("Masukkan teks yang lengkap dan valid, bukan hanya satu kata atau karakter acak.")
-        else:
+        elif not is_indonesian(user_input):
+            st.warning("❌ Teks harus ditulis dalam Bahasa Indonesia.")
             with st.spinner("Memproses teks dan memprediksi..."):
                 processed = preprocess_text(user_input)
                 vectorized = vectorizer.transform([processed])
@@ -276,4 +287,5 @@ elif selected == "Riwayat Prediksi":
         st.download_button("⬇️ Unduh Riwayat (.csv)", data=csv_data, file_name="riwayat_prediksi_firebase.csv", mime="text/csv")
     else:
         st.info("Belum ada data prediksi yang disimpan.")
+
 
