@@ -290,3 +290,4 @@ elif selected == "Riwayat Prediksi":
 
 
 
+
