@@ -294,23 +294,68 @@ elif selected == "Riwayat Prediksi":
 elif selected == "Info Sistem":
     import platform
     import psutil
+    import os
+    import socket
 
     st.subheader("💻 Informasi Sistem (Streamlit Cloud)")
 
+    # ------------------------
+    # Informasi CPU dan Memori
+    # ------------------------
     st.markdown("### 🧠 CPU dan Memori")
-    cpu_count = psutil.cpu_count(logical=True)
-    ram_total = psutil.virtual_memory().total / (1024 ** 3)
-    ram_available = psutil.virtual_memory().available / (1024 ** 3)
+    st.write(f"CPU Logical Cores: **{psutil.cpu_count(logical=True)}**")
+    st.write(f"CPU Physical Cores: **{psutil.cpu_count(logical=False)}**")
 
-    st.write(f"Jumlah CPU Logical: **{cpu_count}**")
-    st.write(f"Total RAM: **{ram_total:.2f} GB**")
-    st.write(f"RAM Tersedia: **{ram_available:.2f} GB**")
+    cpu_freq = psutil.cpu_freq()
+    if cpu_freq:
+        st.write(f"CPU Frequency: **{cpu_freq.max:.2f} MHz** (Max), **{cpu_freq.current:.2f} MHz** (Current)")
 
+    virtual_mem = psutil.virtual_memory()
+    st.write(f"Total RAM: **{virtual_mem.total / (1024**3):.2f} GB**")
+    st.write(f"Available RAM: **{virtual_mem.available / (1024**3):.2f} GB**")
+    st.write(f"Memory Usage: **{virtual_mem.percent}%**")
+
+    # ------------------------
+    # Disk Information
+    # ------------------------
+    st.markdown("### 💽 Disk")
+    disk = psutil.disk_usage('/')
+    st.write(f"Total Disk: **{disk.total / (1024**3):.2f} GB**")
+    st.write(f"Used Disk: **{disk.used / (1024**3):.2f} GB**")
+    st.write(f"Free Disk: **{disk.free / (1024**3):.2f} GB**")
+    st.write(f"Disk Usage: **{disk.percent}%**")
+
+    # ------------------------
+    # Sistem Operasi
+    # ------------------------
     st.markdown("### 🛠️ Sistem Operasi")
     st.write("Platform:", platform.system())
     st.write("Versi:", platform.version())
+    st.write("Release:", platform.release())
     st.write("Arsitektur:", platform.machine())
-    st.write("Prosesor:", platform.processor())
+    st.write("Processor:", platform.processor())
+
+    # ------------------------
+    # Python Environment
+    # ------------------------
+    st.markdown("### 🐍 Python Environment")
+    st.write("Python Version:", platform.python_version())
+    st.write("Python Compiler:", platform.python_compiler())
+    st.write("Python Build:", platform.python_build())
+
+    # ------------------------
+    # Informasi Jaringan (Terbatas)
+    # ------------------------
+    st.markdown("### 🌐 Jaringan (Terbatas)")
+    try:
+        hostname = socket.gethostname()
+        ip_address = socket.gethostbyname(hostname)
+        st.write("Hostname:", hostname)
+        st.write("IP Address:", ip_address)
+    except:
+        st.write("Tidak dapat mengambil informasi jaringan.")
+
+
 
 
 
