@@ -124,12 +124,6 @@ if selected == "Deteksi Hoaks":
 # ✅ Menu Deteksi Hoaks
 if selected == "Deteksi Hoaks":
     st.subheader("Masukkan Teks Berita:")
-    user_input = st.text_area(
-    "Contoh: Pemerintah mengumumkan vaksin palsu beredar di Jakarta...",
-    height=200,
-    key="input_berita_hoax"
-    )
-
     if st.button("Analisis Berita"):
         if not user_input.strip():
             st.warning("Teks tidak boleh kosong.")
@@ -394,6 +388,7 @@ elif selected == "Info Sistem":
         st.write("IP Address:", ip_address)
     except:
         st.write("Tidak dapat mengambil informasi jaringan.")
+
 
 
 
