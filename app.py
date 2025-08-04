@@ -121,7 +121,12 @@ if selected == "Deteksi Hoaks":
     st.subheader("Masukkan Teks Berita:")
     user_input = st.text_area("Contoh: Pemerintah mengumumkan vaksin palsu beredar di Jakarta...", height=200)
 
- if st.button("Analisis Berita"):
+# ✅ Menu Deteksi Hoaks
+if selected == "Deteksi Hoaks":
+    st.subheader("Masukkan Teks Berita:")
+    user_input = st.text_area("Contoh: Pemerintah mengumumkan vaksin palsu beredar di Jakarta...", height=200)
+
+    if st.button("Analisis Berita"):
         if not user_input.strip():
             st.warning("Teks tidak boleh kosong.")
         elif not is_valid_text(user_input):
@@ -141,7 +146,8 @@ if selected == "Deteksi Hoaks":
 
             st.subheader("Keyakinan Model:")
             df_proba = pd.DataFrame({"Label": ["Non-Hoax", "Hoax"], "Probabilitas": probas})
-            fig = px.pie(df_proba, names="Label", values="Probabilitas", title="Distribusi Probabilitas Prediksi",
+            fig = px.pie(df_proba, names="Label", values="Probabilitas",
+                         title="Distribusi Probabilitas Prediksi",
                          color_discrete_sequence=["green", "red"])
             st.plotly_chart(fig, use_container_width=True)
 
@@ -150,7 +156,8 @@ if selected == "Deteksi Hoaks":
                     text=user_input,
                     predicted_label=pred_label,
                     used_links=[],
-                    distribution={"Non-Hoax": f"{probas[0]*100:.1f}", "Hoax": f"{probas[1]*100:.1f}"}
+                    distribution={"Non-Hoax": f"{probas[0]*100:.1f}",
+                                  "Hoax": f"{probas[1]*100:.1f}"}
                 )
                 with st.expander("Hasil Interpretasi LLM"):
                     st.write(result.get('output_mentah', 'Tidak tersedia'))
@@ -174,6 +181,7 @@ if selected == "Deteksi Hoaks":
 
             except Exception as e:
                 st.error(f"❌ Terjadi kesalahan saat menggunakan LLM:\n{e}")
+
 
     if hasil_semua:
         df_hasil = pd.concat(hasil_semua, ignore_index=True)
@@ -382,6 +390,7 @@ elif selected == "Info Sistem":
         st.write("IP Address:", ip_address)
     except:
         st.write("Tidak dapat mengambil informasi jaringan.")
+
 
 
 
