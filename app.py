@@ -121,13 +121,14 @@ if selected == "Deteksi Hoaks":
     st.subheader("Masukkan Teks Berita:")
     user_input = st.text_area("Contoh: Pemerintah mengumumkan vaksin palsu beredar di Jakarta...", height=200)
 
-    if st.button("Analisis Berita"):
+ if st.button("Analisis Berita"):
         if not user_input.strip():
             st.warning("Teks tidak boleh kosong.")
         elif not is_valid_text(user_input):
             st.warning("Masukkan teks yang lengkap dan valid, bukan hanya satu kata atau karakter acak.")
         elif not is_indonesian(user_input):
             st.warning("❌ Teks harus ditulis dalam Bahasa Indonesia.")
+        else:
             with st.spinner("Memproses teks dan memprediksi..."):
                 processed = preprocess_text(user_input)
                 vectorized = vectorizer.transform([processed])
@@ -145,8 +146,12 @@ if selected == "Deteksi Hoaks":
             st.plotly_chart(fig, use_container_width=True)
 
             try:
-                result = analyze_with_gemini(text=user_input, predicted_label=pred_label, used_links=[],
-                                             distribution={"Non-Hoax": f"{probas[0]*100:.1f}", "Hoax": f"{probas[1]*100:.1f}"})
+                result = analyze_with_gemini(
+                    text=user_input,
+                    predicted_label=pred_label,
+                    used_links=[],
+                    distribution={"Non-Hoax": f"{probas[0]*100:.1f}", "Hoax": f"{probas[1]*100:.1f}"}
+                )
                 with st.expander("Hasil Interpretasi LLM"):
                     st.write(result.get('output_mentah', 'Tidak tersedia'))
 
@@ -377,6 +382,7 @@ elif selected == "Info Sistem":
         st.write("IP Address:", ip_address)
     except:
         st.write("Tidak dapat mengambil informasi jaringan.")
+
 
 
 
