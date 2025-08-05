@@ -49,5 +49,6 @@ firebase-admin>=6.4.0
 # ✅ Utilities
 # =======================
 pytz>=2024.1
+Requests>=2.31.0
 psutil==7.0.0
 py-cpuinfo==9.0.0
