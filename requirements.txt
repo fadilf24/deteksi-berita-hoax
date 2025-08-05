@@ -51,6 +51,6 @@ firebase-admin>=6.4.0
 pytz>=2024.1
 requests>=2.31.0
 psutil>=7.0.0
-py-cpuinfo==9.0.0
-GPUtil==1.4.0
-pyamdgpuinfo==2.6.0
+py-cpuinfo>=9.0.0
+GPUtil>=1.4.0
+pyamdgpuinfo>=2.6.0
