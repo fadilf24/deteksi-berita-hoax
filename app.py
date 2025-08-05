@@ -328,10 +328,8 @@ elif selected == "Riwayat Prediksi":
 elif selected == "Info Sistem":
     import platform
     import psutil
-    import cpuinfo
-    import GPUtil
-    import pyamdgpuinfo
     import socket
+    import cpuinfo
 
     st.subheader("💻 Informasi Sistem (Streamlit Cloud)")
 
@@ -363,26 +361,33 @@ elif selected == "Info Sistem":
     st.write(f"Free Disk: {disk.free/1024**3:.2f} GB")
     st.write(f"Usage: {disk.percent}%")
 
-    # GPU (Nvidia)
+    # GPU (Nvidia) – optional safe import
     st.markdown("### ⚙️ GPU Nvidia (jika ada)")
-    gpus = GPUtil.getGPUs()
-    if gpus:
-        for gpu in gpus:
-            st.write(f"Name: {gpu.name}")
-            st.write(f"Load: {gpu.load*100:.1f}%")
-            st.write(f"Memory Free: {gpu.memoryFree}MB")
-            st.write(f"Memory Total: {gpu.memoryTotal}MB")
-    else:
-        st.write("GPU Nvidia tidak terdeteksi.")
+    try:
+        import GPUtil
+        gpus = GPUtil.getGPUs()
+        if gpus:
+            for gpu in gpus:
+                st.write(f"Name: {gpu.name}")
+                st.write(f"Load: {gpu.load*100:.1f}%")
+                st.write(f"Memory Free: {gpu.memoryFree}MB")
+                st.write(f"Memory Total: {gpu.memoryTotal}MB")
+        else:
+            st.write("GPU Nvidia tidak terdeteksi.")
+    except ImportError:
+        st.write("Library GPUtil tidak tersedia.")
 
-    # GPU (AMD)
+    # GPU (AMD) – optional safe import
     st.markdown("### 🔧 GPU AMD (jika ada)")
     try:
+        import pyamdgpuinfo
         amd_info = pyamdgpuinfo.get_gpu_information()
         if amd_info:
             st.json(amd_info)
         else:
             st.write("GPU AMD tidak terdeteksi.")
+    except ImportError:
+        st.write("Library pyamdgpuinfo tidak tersedia.")
     except Exception as e:
         st.write("Tidak dapat membaca GPU AMD:", e)
 
