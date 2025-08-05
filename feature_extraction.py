@@ -42,18 +42,13 @@ def tfidf_to_dataframe(tfidf_matrix, vectorizer):
     """
     return pd.DataFrame(tfidf_matrix.toarray(), columns=vectorizer.get_feature_names_out())
 
-def save_tfidf_output(df_preprocessed, tfidf_df, preprocessed_path='preprocessed_data.csv', tfidf_path='tfidf_output.csv'):
+def save_tfidf_only(tfidf_df, tfidf_path='tfidf_output.csv'):
     """
-    Simpan hasil preprocessing dan TF-IDF dalam format CSV.
+    Simpan hanya output TF-IDF ke dalam file CSV.
     """
-    try:
-        df_preprocessed.to_csv(preprocessed_path, index=False)
-        print(f"Preprocessed data saved to {preprocessed_path}")
-    except Exception as e:
-        print(f"Gagal menyimpan preprocessed data: {e}")
-
     try:
         tfidf_df.to_csv(tfidf_path, index=False)
         print(f"TF-IDF output saved to {tfidf_path}")
     except Exception as e:
         print(f"Gagal menyimpan TF-IDF data: {e}")
+
