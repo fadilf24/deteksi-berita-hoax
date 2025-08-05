@@ -328,75 +328,75 @@ elif selected == "Riwayat Prediksi":
 elif selected == "Info Sistem":
     import platform
     import psutil
-    import os
+    import cpuinfo
+    import GPUtil
+    import pyamdgpuinfo
     import socket
 
     st.subheader("💻 Informasi Sistem (Streamlit Cloud)")
 
-    # ------------------------
-    # Informasi CPU dan Memori
-    # ------------------------
-    st.markdown("### 🧠 CPU dan Memori")
-    st.write(f"CPU Logical Cores: **{psutil.cpu_count(logical=True)}**")
-    st.write(f"CPU Physical Cores: **{psutil.cpu_count(logical=False)}**")
+    # CPUINFO
+    cpu = cpuinfo.get_cpu_info()
+    st.markdown("### 🧠 CPU Detail")
+    st.write("Brand:", cpu.get("brand_raw"))
+    st.write("Architecture:", cpu.get("arch"))
+    st.write("Bits:", cpu.get("bits"))
+    st.write("Cores (logical):", psutil.cpu_count(logical=True))
+    st.write("Cores (physical):", psutil.cpu_count(logical=False))
 
-    cpu_freq = psutil.cpu_freq()
-    if cpu_freq:
-        st.write(f"CPU Frequency: **{cpu_freq.max:.2f} MHz** (Max), **{cpu_freq.current:.2f} MHz** (Current)")
+    # Frekuensi CPU
+    freq = psutil.cpu_freq()
+    if freq:
+        st.write(f"Frequency: {freq.current:.2f} MHz / Max: {freq.max:.2f} MHz")
 
-    virtual_mem = psutil.virtual_memory()
-    st.write(f"Total RAM: **{virtual_mem.total / (1024**3):.2f} GB**")
-    st.write(f"Available RAM: **{virtual_mem.available / (1024**3):.2f} GB**")
-    st.write(f"Memory Usage: **{virtual_mem.percent}%**")
+    # MEMORY
+    st.markdown("### 💾 RAM")
+    vm = psutil.virtual_memory()
+    st.write(f"Total RAM: {vm.total/1024**3:.2f} GB")
+    st.write(f"Available: {vm.available/1024**3:.2f} GB")
+    st.write(f"Usage: {vm.percent}%")
 
-    # ------------------------
-    # Disk Information
-    # ------------------------
+    # DISK
     st.markdown("### 💽 Disk")
     disk = psutil.disk_usage('/')
-    st.write(f"Total Disk: **{disk.total / (1024**3):.2f} GB**")
-    st.write(f"Used Disk: **{disk.used / (1024**3):.2f} GB**")
-    st.write(f"Free Disk: **{disk.free / (1024**3):.2f} GB**")
-    st.write(f"Disk Usage: **{disk.percent}%**")
+    st.write(f"Total Disk: {disk.total/1024**3:.2f} GB")
+    st.write(f"Free Disk: {disk.free/1024**3:.2f} GB")
+    st.write(f"Usage: {disk.percent}%")
 
-    # ------------------------
-    # Sistem Operasi
-    # ------------------------
-    st.markdown("### 🛠️ Sistem Operasi")
-    st.write("Platform:", platform.system())
-    st.write("Versi:", platform.version())
-    st.write("Release:", platform.release())
-    st.write("Arsitektur:", platform.machine())
-    st.write("Processor:", platform.processor())
+    # GPU (Nvidia)
+    st.markdown("### ⚙️ GPU Nvidia (jika ada)")
+    gpus = GPUtil.getGPUs()
+    if gpus:
+        for gpu in gpus:
+            st.write(f"Name: {gpu.name}")
+            st.write(f"Load: {gpu.load*100:.1f}%")
+            st.write(f"Memory Free: {gpu.memoryFree}MB")
+            st.write(f"Memory Total: {gpu.memoryTotal}MB")
+    else:
+        st.write("GPU Nvidia tidak terdeteksi.")
 
-    # ------------------------
-    # Python Environment
-    # ------------------------
-    st.markdown("### 🐍 Python Environment")
-    st.write("Python Version:", platform.python_version())
-    st.write("Python Compiler:", platform.python_compiler())
-    st.write("Python Build:", platform.python_build())
+    # GPU (AMD)
+    st.markdown("### 🔧 GPU AMD (jika ada)")
+    try:
+        amd_info = pyamdgpuinfo.get_gpu_information()
+        if amd_info:
+            st.json(amd_info)
+        else:
+            st.write("GPU AMD tidak terdeteksi.")
+    except Exception as e:
+        st.write("Tidak dapat membaca GPU AMD:", e)
 
-    # ------------------------
-    # Informasi Jaringan (Terbatas)
-    # ------------------------
-    st.markdown("### 🌐 Jaringan (Terbatas)")
+    # OS & Python
+    st.markdown("### 🛠️ Sistem Operasi & Python")
+    st.write("OS:", platform.platform())
+    st.write("Python:", platform.python_version())
+
+    # Jaringan
+    st.markdown("### 🌐 Jaringan")
     try:
         hostname = socket.gethostname()
-        ip_address = socket.gethostbyname(hostname)
+        ip = socket.gethostbyname(hostname)
         st.write("Hostname:", hostname)
-        st.write("IP Address:", ip_address)
+        st.write("IP:", ip)
     except:
         st.write("Tidak dapat mengambil informasi jaringan.")
-
-
-
-
-
-
-
-
-
-
-
-
