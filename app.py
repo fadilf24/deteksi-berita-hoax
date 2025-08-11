@@ -70,8 +70,8 @@ def read_predictions_from_firebase():
 with st.sidebar:
     selected = option_menu(
         menu_title=None,
-        options=["Deteksi Hoaks", "Dataset", "Preprocessing", "Evaluasi Model", "Riwayat Prediksi", "Info Sistem"],
-        icons=["search", "folder", "tools", "bar-chart", "clock-history", "cpu"],
+        options=["Deteksi Hoaks", "Dataset", "Split Data", "Preprocessing", "Evaluasi Model", "Riwayat Prediksi", "Info Sistem"],
+        icons=["search", "folder", "shuffle", "tools", "bar-chart", "clock-history", "cpu"],
         default_index=0,
         orientation="vertical"
     )
@@ -122,6 +122,31 @@ except Exception as e:
     st.stop()
 
 hasil_semua = []
+
+def show_split_data_page(df):
+    st.header("📊 Split Data & Distribusi Label")
+
+    # Ambil fitur dan label
+    X = df["T_text"]
+    y = df["label"]
+
+    # Gunakan split_data dari classification.py (default test_size=0.2)
+    X_train, X_test, y_train, y_test = split_data(X, y)
+
+    # Distribusi label pada data train
+    st.subheader("Distribusi Label - Data Train")
+    train_dist = y_train.value_counts().reset_index()
+    train_dist.columns = ["Label", "Jumlah"]
+    st.dataframe(train_dist)
+
+    # Distribusi label pada data test
+    st.subheader("Distribusi Label - Data Test")
+    test_dist = y_test.value_counts().reset_index()
+    test_dist.columns = ["Label", "Jumlah"]
+    st.dataframe(test_dist)
+
+    # Ringkasan total
+    st.info(f"Jumlah data latih: {len(X_train)} | Jumlah data uji: {len(X_test)}")
 
 # ✅ Menu Deteksi Hoaks
 if selected == "Deteksi Hoaks":
@@ -199,6 +224,10 @@ elif selected == "Dataset":
     st.subheader("Dataset Detik.com:")
     st.dataframe(df2)
 
+elif selected == "Split Data":
+    show_split_data_page(df)
+
+# menu preprocessing
 elif selected == "Preprocessing":
     st.subheader("🔧 Tahapan Preprocessing Dataset")
 
@@ -408,4 +437,5 @@ elif selected == "Info Sistem":
         st.write("IP:", ip)
     except:
         st.write("Tidak dapat mengambil informasi jaringan.")
+
 
