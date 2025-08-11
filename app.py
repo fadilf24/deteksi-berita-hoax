@@ -96,7 +96,7 @@ def prepare_data(df1, df2):
 def extract_features_and_model(df):
     X, vectorizer = tfidf_transform(df["T_text"])
     y = df["label"]
-    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.4, random_state=42)
     model = MultinomialNB().fit(X_train, y_train)
     y_pred = model.predict(X_test)
     return model, vectorizer, X_test, y_test, y_pred
@@ -404,4 +404,5 @@ elif selected == "Info Sistem":
         st.write("IP:", ip)
     except:
         st.write("Tidak dapat mengambil informasi jaringan.")
+
 
