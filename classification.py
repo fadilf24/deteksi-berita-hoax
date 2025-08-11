@@ -9,7 +9,7 @@ from sklearn.base import ClassifierMixin
 def split_data(
     X: Any, 
     y: Any, 
-    test_size: float = 0.2, 
+    test_size: float = 0.4, 
     random_state: int = 42
 ) -> Tuple[Any, Any, Any, Any]:
     """
@@ -87,3 +87,4 @@ def prediction_distribution(
         for label, count in zip(unique, counts)
     }
     return percentages
+
