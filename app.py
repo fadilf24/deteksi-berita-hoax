@@ -38,20 +38,23 @@ def is_indonesian(text, min_prob=0.90):
         
 st.set_page_config(page_title="Deteksi Berita Hoaks", page_icon="🔎", layout="wide")
 
-# Fungsi untuk membuat PDF
-def generate_pdf(data):
+# Fungsi membuat PDF dari DataFrame
+def generate_pdf_from_df(df):
     pdf = FPDF()
     pdf.add_page()
     pdf.set_font("Arial", size=14)
     pdf.cell(0, 10, "Hasil Deteksi Berita Hoaks", ln=True, align="C")
     pdf.ln(10)
 
-    pdf.set_font("Arial", size=12)
-    for key, value in data.items():
-        pdf.multi_cell(0, 8, f"{key}: {value}", align="L")
-        pdf.ln(1)
+    pdf.set_font("Arial", size=10)
+        # Loop per baris hasil
+    for i, row in df.iterrows():
+        pdf.cell(0, 8, f"Data #{i+1}", ln=True, align="L")
+        for col in df.columns:
+            pdf.multi_cell(0, 6, f"{col}: {row[col]}", align="L")
+        pdf.ln(5)
 
-    return pdf.output(dest='S').encode('latin1')  # kembalikan byte untuk download
+    return pdf.output(dest='S')  # Sudah dalam bytes
 
 
 
@@ -236,9 +239,9 @@ if selected == "Deteksi Hoaks":
     if hasil_semua:
         df_hasil = pd.concat(hasil_semua, ignore_index=True)
         csv = df_hasil.to_csv(index=False).encode('utf-8')
-        pdf_data = generate_pdf(df_hasil)
+        pdf_data = generate_pdf_from_df(df_hasil)
         st.download_button("⬇️ Unduh Hasil (.csv)", data=csv, file_name="hasil_deteksi_berita.csv", mime="text/csv")
-        st.download_button(label="📄 Unduh Hasil (.pdf)", data=pdf_data, file_name="hasil_deteksi_berita.pdf", mime="application/pdf")
+        st.download_button(label="📄 Unduh Hasil (.pdf)", data=df_hasil, file_name="hasil_deteksi_berita.pdf", mime="application/pdf")
 
 # ✅ Menu Dataset
 elif selected == "Dataset":
@@ -460,6 +463,7 @@ elif selected == "Info Sistem":
         st.write("IP:", ip)
     except:
         st.write("Tidak dapat mengambil informasi jaringan.")
+
 
 
 
