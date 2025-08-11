@@ -241,7 +241,7 @@ if selected == "Deteksi Hoaks":
         csv = df_hasil.to_csv(index=False).encode('utf-8')
         pdf_data = generate_pdf_from_df(df_hasil)
         st.download_button("⬇️ Unduh Hasil (.csv)", data=csv, file_name="hasil_deteksi_berita.csv", mime="text/csv")
-        st.download_button(label="📄 Unduh Hasil (.pdf)", data=df_hasil, file_name="hasil_deteksi_berita.pdf", mime="application/pdf")
+        st.download_button(label="📄 Unduh Hasil (.pdf)", data=pdf_data, file_name="hasil_deteksi_berita.pdf", mime="application/pdf")
 
 # ✅ Menu Dataset
 elif selected == "Dataset":
@@ -463,6 +463,7 @@ elif selected == "Info Sistem":
         st.write("IP:", ip)
     except:
         st.write("Tidak dapat mengambil informasi jaringan.")
+
 
 
 
