@@ -26,12 +26,21 @@ from interpretation import configure_gemini, analyze_with_gemini
 from langdetect import detect_langs, DetectorFactory
 DetectorFactory.seed = 0  # agar konsisten hasil
 
-def wrap_text(teks, width=100):
-    return "\n".join(textwrap.wrap(str(teks), width=width))
-
-def break_long_words(teks, max_len=50):
-    teks = str(teks)
-    return " ".join([teks[i:i+max_len] for i in range(0, len(teks), max_len)])
+def safe_wrap(text, width=80):
+    """Membungkus teks panjang agar tidak error di FPDF"""
+    if not isinstance(text, str):
+        text = str(text)
+    # Potong kata super panjang biar ada spasi setiap width karakter
+    fixed_words = []
+    for word in text.split():
+        if len(word) > width:
+            fixed_words.extend(textwrap.wrap(word, width))
+        else:
+            fixed_words.append(word)
+    wrapped_text = " ".join(fixed_words)
+    # Bungkus per baris supaya multi_cell aman
+    return "\n".join(textwrap.wrap(wrapped_text, width))
+    
 #untuk menyimmpan file dalam format pdf
 def simpan_hasil_ke_pdf(df):
     pdf = FPDF()
@@ -56,6 +65,7 @@ def simpan_hasil_ke_pdf(df):
         pdf.ln(5)
 
     path = "/mount/data/hasil_analisis.pdf"
+    pdf.multi_cell(0, 7, f"Teks Preprocessed:\n{safe_wrap(row['Preprocessed'], 80)}")
     pdf.output(path)
     return path
 
@@ -443,6 +453,7 @@ elif selected == "Info Sistem":
         st.write("IP:", ip)
     except:
         st.write("Tidak dapat mengambil informasi jaringan.")
+
 
 
 
