@@ -126,11 +126,15 @@ hasil_semua = []
 def show_split_data_page(df):
     st.header("📊 Split Data & Distribusi Label")
 
-    # Ambil fitur dan label
-    X = df["T_text"]
-    y = df["label"]
+    # Mapping label angka ke teks
+    label_mapping = {1: "non-hoax", 0: "hoax"}
+    df["label_text"] = df["label"].map(label_mapping)
 
-    # Gunakan split_data dari classification.py (default test_size=0.2)
+    # Ambil fitur dan label teks
+    X = df["T_text"]
+    y = df["label_text"]
+
+    # Split data (pakai default 20% test size dari classification.py)
     X_train, X_test, y_train, y_test = split_data(X, y)
 
     # Distribusi label pada data train
@@ -437,5 +441,6 @@ elif selected == "Info Sistem":
         st.write("IP:", ip)
     except:
         st.write("Tidak dapat mengambil informasi jaringan.")
+
 
 
