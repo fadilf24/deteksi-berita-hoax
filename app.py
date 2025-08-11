@@ -232,7 +232,7 @@ elif selected == "Preprocessing":
     st.subheader("🔧 Tahapan Preprocessing Dataset")
 
     # 1️⃣ Penambahan Atribut Label pada Dataset Detik
-    st.markdown("### 1️⃣ Penambahan Atribut Label pada Dataset Detik")
+    st.markdown("### 1️ Penambahan Atribut Label pada Dataset Detik")
     st.write("Menambahkan atribut label pada dataset detik.com.")
 
     # Tambahkan label jika belum ada
@@ -245,7 +245,7 @@ elif selected == "Preprocessing":
     # Tampilkan hasilnya
     st.dataframe(df2.head())
 
-    st.markdown("### 2️ Pemilihan Atribut yang Digunakan")
+    st.markdown("### 2 Pemilihan Atribut yang Digunakan")
     st.write("Atribut yang dipilih untuk digunakan dalam analisis adalah: `judul`, `narasi`, dan `label`.")
 
     st.subheader("📄 Dataset Kaggle")
@@ -254,10 +254,10 @@ elif selected == "Preprocessing":
     st.subheader("📄 Dataset Detik.com")
     st.dataframe(df2[["Judul", "Konten", "label"]].head())
 
-    st.markdown("### Penggabungan Dataset Kaggle + Detik.com")
+    st.markdown("### 3 Penggabungan Dataset Kaggle + Detik.com")
     st.dataframe(df[["judul", "narasi", "label"]].head(), use_container_width=True)
 
-    st.markdown("### Penambahan Atribut `text` (Gabungan Judul + Narasi)")
+    st.markdown("### 4. Penambahan Atribut `text` (Gabungan Judul + Narasi)")
     st.dataframe(df[["text"]].head(), use_container_width=True)
 
     st.markdown("### 🔎 Contoh Proses Lengkap Preprocessing")
@@ -437,6 +437,7 @@ elif selected == "Info Sistem":
         st.write("IP:", ip)
     except:
         st.write("Tidak dapat mengambil informasi jaringan.")
+
 
 
 
