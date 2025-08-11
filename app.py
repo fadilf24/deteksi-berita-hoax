@@ -47,16 +47,16 @@ def generate_pdf_from_df(df):
     pdf.ln(10)
 
     pdf.set_font("Arial", size=10)
-        # Loop per baris hasil
+    max_width = 190  # lebar maksimum teks
+
     for i, row in df.iterrows():
         pdf.cell(0, 8, f"Data #{i+1}", ln=True, align="L")
         for col in df.columns:
-            pdf.multi_cell(0, 6, f"{col}: {row[col]}", align="L")
-        pdf.ln(5)
+            text_value = str(row[col])  # pastikan string
+            pdf.multi_cell(max_width, 6, f"{col}: {text_value}", align="L")
+        pdf.ln(3)
 
-    return pdf.output(dest='S')  # Sudah dalam bytes
-
-
+    return pdf.output(dest='S')  # langsung return bytes
 
 # ✅ Konfigurasi Firebase
 firebase_cred = dict(st.secrets["FIREBASE_KEY"])
@@ -463,6 +463,7 @@ elif selected == "Info Sistem":
         st.write("IP:", ip)
     except:
         st.write("Tidak dapat mengambil informasi jaringan.")
+
 
 
 
