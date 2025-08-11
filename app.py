@@ -26,31 +26,36 @@ from langdetect import detect_langs, DetectorFactory
 DetectorFactory.seed = 0  # agar konsisten hasil
 
 #untuk menyimmpan file dalam format pdf
-def simpan_hasil_ke_pdf(df_hasil, filename="hasil_analisis.pdf"):
-    pdf = FPDF()
+def simpan_hasil_ke_pdf(df_hasil):
+    class PDF(FPDF):
+        def header(self):
+            self.set_font('Helvetica', 'B', 16)
+            self.cell(0, 10, 'Hasil Analisis Deteksi Berita Hoaks', ln=True, align='C')
+            self.ln(5)
+
+        def footer(self):
+            self.set_y(-15)
+            self.set_font('Helvetica', 'I', 8)
+            self.cell(0, 10, f'Halaman {self.page_no()}', align='C')
+
+    pdf = PDF()
+    pdf.set_auto_page_break(auto=True, margin=15)
     pdf.add_page()
-    pdf.set_font("Arial", size=12)
+    pdf.set_font('Helvetica', '', 12)
 
-    pdf.cell(200, 10, txt="Hasil Analisis Deteksi Berita Hoaks", ln=True, align="C")
-    pdf.ln(10)
+    for i, row in df_hasil.iterrows():
+        pdf.multi_cell(0, 7, f"Berita {i+1}:", align="L")
+        pdf.multi_cell(0, 7, f"Teks Asli: {row['Teks']}", align="L")
+        pdf.multi_cell(0, 7, f"Teks Preprocessed: {row['Preprocessed']}", align="L")
+        pdf.multi_cell(0, 7, f"Hasil Klasifikasi: {row['Klasifikasi']}", align="L")
+        pdf.multi_cell(0, 7, f"Tingkat Probabilitas Hoaks: {row['Probabilitas']}%", align="L")
+        pdf.ln(5)
 
-    # Header tabel
-    col_width = pdf.w / (len(df_hasil.columns) + 1)
-    row_height = pdf.font_size * 1.5
-
-    for col in df_hasil.columns:
-        pdf.cell(col_width, row_height, col, border=1)
-    pdf.ln(row_height)
-
-    # Isi tabel
-    for _, row in df_hasil.iterrows():
-        for item in row:
-            pdf.cell(col_width, row_height, str(item), border=1)
-        pdf.ln(row_height)
-
-    path_pdf = os.path.join(os.getcwd(), filename)
-    pdf.output(path_pdf)
-    return path_pdf
+    output_dir = "hasil_pdf"
+    os.makedirs(output_dir, exist_ok=True)
+    pdf_path = os.path.join(output_dir, "hasil_analisis.pdf")
+    pdf.output(pdf_path)
+    return pdf_path
 
 #validasi teks bahasa indonesia
 def is_indonesian(text, min_prob=0.90):
@@ -436,6 +441,7 @@ elif selected == "Info Sistem":
         st.write("IP:", ip)
     except:
         st.write("Tidak dapat mengambil informasi jaringan.")
+
 
 
 
