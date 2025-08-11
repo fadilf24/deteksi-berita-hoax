@@ -15,6 +15,7 @@ from sklearn.naive_bayes import MultinomialNB
 from sklearn.metrics import classification_report, accuracy_score, confusion_matrix
 from streamlit_option_menu import option_menu
 from fpdf import FPDF
+import textwrap
 import firebase_admin
 from firebase_admin import credentials, db
 
@@ -436,6 +437,7 @@ elif selected == "Info Sistem":
         st.write("IP:", ip)
     except:
         st.write("Tidak dapat mengambil informasi jaringan.")
+
 
 
 
