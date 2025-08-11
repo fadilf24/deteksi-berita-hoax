@@ -221,46 +221,37 @@ if hasil_semua:
     csv = df_hasil.to_csv(index=False).encode('utf-8')
     st.download_button("⬇️ Unduh Hasil (.csv)", data=csv, file_name="hasil_deteksi_berita.csv", mime="text/csv")
 
-    # ✅ Tambahan: Download PDF
-    if st.button("⬇️ Unduh Hasil (.pdf)"):
-        class PDF(FPDF):
-            def header(self):
-                self.set_font('Arial', 'B', 16)
-                self.cell(0, 10, 'Hasil Deteksi Berita Hoaks', 0, 1, 'C')
-                self.ln(5)
-            def chapter_title(self, title):
-                self.set_font('Arial', 'B', 12)
-                self.cell(0, 10, title, 0, 1)
-            def chapter_body(self, body):
-                self.set_font('Arial', '', 11)
-                self.multi_cell(0, 8, body)
-                self.ln()
+    import io
+    pdf = FPDF()
+    pdf.add_page()
+    pdf.set_font("Arial", size=12)
 
-        pdf = PDF()
-        pdf.add_page()
+    for idx, row in df_hasil.iterrows():
+        pdf.set_font("Arial", 'B', 14)
+        pdf.cell(0, 10, f"Data #{idx+1}", ln=True)
+        pdf.set_font("Arial", size=12)
+        pdf.multi_cell(0, 10, f"Teks Asli:\n{row['Input']}")
+        pdf.multi_cell(0, 10, f"Preprocessed:\n{row['Preprocessed']}")
+        pdf.multi_cell(0, 10, f"Prediksi Model: {row['Prediksi Model']}")
+        pdf.multi_cell(0, 10, f"Probabilitas Non-Hoax: {row['Probabilitas Non-Hoax']}")
+        pdf.multi_cell(0, 10, f"Probabilitas Hoax: {row['Probabilitas Hoax']}")
+        pdf.multi_cell(0, 10, f"Kebenaran LLM: {row.get('Kebenaran LLM', '-')}")
+        pdf.multi_cell(0, 10, f"Alasan LLM:\n{row.get('Alasan LLM', '-')}")
+        pdf.multi_cell(0, 10, f"Ringkasan Berita:\n{row.get('Ringkasan Berita', '-')}")
+        pdf.multi_cell(0, 10, f"Perbandingan:\n{row.get('Perbandingan', '-')}")
+        pdf.multi_cell(0, 10, f"Penjelasan Koreksi:\n{row.get('Penjelasan Koreksi', '-')}")
+        pdf.ln(5)
 
-        for idx, row in df_hasil.iterrows():
-            pdf.chapter_title(f"Data #{idx+1}")
-            pdf.chapter_body(f"Teks Asli:\n{row['Input']}")
-            pdf.chapter_body(f"Preprocessed:\n{row['Preprocessed']}")
-            pdf.chapter_body(f"Prediksi Model: {row['Prediksi Model']}")
-            pdf.chapter_body(f"Probabilitas Non-Hoax: {row['Probabilitas Non-Hoax']}")
-            pdf.chapter_body(f"Probabilitas Hoax: {row['Probabilitas Hoax']}")
-            pdf.chapter_body(f"Kebenaran LLM: {row.get('Kebenaran LLM', '-')}")
-            pdf.chapter_body(f"Alasan LLM:\n{row.get('Alasan LLM', '-')}")
-            pdf.chapter_body(f"Ringkasan Berita:\n{row.get('Ringkasan Berita', '-')}")
-            pdf.chapter_body(f"Perbandingan:\n{row.get('Perbandingan', '-')}")
-            pdf.chapter_body(f"Penjelasan Koreksi:\n{row.get('Penjelasan Koreksi', '-')}")
-            pdf.ln(5)
+    pdf_buffer = io.BytesIO()
+    pdf.output(pdf_buffer)
+    pdf_buffer.seek(0)
 
-        pdf_output = pdf.output(dest='S').encode('latin-1')
-        st.download_button(
-            label="📄 Download PDF",
-            data=pdf_output,
-            file_name="hasil_deteksi_berita.pdf",
-            mime="application/pdf"
-        )
-
+    st.download_button(
+        label="📄 Unduh Hasil (.pdf)",
+        data=pdf_buffer,
+        file_name="hasil_deteksi_berita.pdf",
+        mime="application/pdf"
+    )
 # ✅ Menu Dataset
 elif selected == "Dataset":
     st.subheader("Dataset Kaggle:")
@@ -481,6 +472,7 @@ elif selected == "Info Sistem":
         st.write("IP:", ip)
     except:
         st.write("Tidak dapat mengambil informasi jaringan.")
+
 
 
 
