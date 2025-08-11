@@ -221,37 +221,6 @@ if hasil_semua:
     csv = df_hasil.to_csv(index=False).encode('utf-8')
     st.download_button("⬇️ Unduh Hasil (.csv)", data=csv, file_name="hasil_deteksi_berita.csv", mime="text/csv")
 
-    import io
-    pdf = FPDF()
-    pdf.add_page()
-    pdf.set_font("Arial", size=12)
-
-    for idx, row in df_hasil.iterrows():
-        pdf.set_font("Arial", 'B', 14)
-        pdf.cell(0, 10, f"Data #{idx+1}", ln=True)
-        pdf.set_font("Arial", size=12)
-        pdf.multi_cell(0, 10, f"Teks Asli:\n{row['Input']}")
-        pdf.multi_cell(0, 10, f"Preprocessed:\n{row['Preprocessed']}")
-        pdf.multi_cell(0, 10, f"Prediksi Model: {row['Prediksi Model']}")
-        pdf.multi_cell(0, 10, f"Probabilitas Non-Hoax: {row['Probabilitas Non-Hoax']}")
-        pdf.multi_cell(0, 10, f"Probabilitas Hoax: {row['Probabilitas Hoax']}")
-        pdf.multi_cell(0, 10, f"Kebenaran LLM: {row.get('Kebenaran LLM', '-')}")
-        pdf.multi_cell(0, 10, f"Alasan LLM:\n{row.get('Alasan LLM', '-')}")
-        pdf.multi_cell(0, 10, f"Ringkasan Berita:\n{row.get('Ringkasan Berita', '-')}")
-        pdf.multi_cell(0, 10, f"Perbandingan:\n{row.get('Perbandingan', '-')}")
-        pdf.multi_cell(0, 10, f"Penjelasan Koreksi:\n{row.get('Penjelasan Koreksi', '-')}")
-        pdf.ln(5)
-
-    pdf_buffer = io.BytesIO()
-    pdf.output(pdf_buffer)
-    pdf_buffer.seek(0)
-
-    st.download_button(
-        label="📄 Unduh Hasil (.pdf)",
-        data=pdf_buffer,
-        file_name="hasil_deteksi_berita.pdf",
-        mime="application/pdf"
-    )
 # ✅ Menu Dataset
 elif selected == "Dataset":
     st.subheader("Dataset Kaggle:")
