@@ -20,6 +20,7 @@ from firebase_admin import credentials, db
 
 from preprocessing import preprocess_text, preprocess_dataframe, load_and_clean_data, preprocess_with_steps
 from feature_extraction import combine_text_columns, tfidf_transform
+from classification import split_data, train_naive_bayes, predict_naive_bayes
 from interpretation import configure_gemini, analyze_with_gemini
 
 from langdetect import detect_langs, DetectorFactory
@@ -96,11 +97,17 @@ def prepare_data(df1, df2):
 def extract_features_and_model(df):
     X, vectorizer = tfidf_transform(df["T_text"])
     y = df["label"]
-    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
-    model = MultinomialNB().fit(X_train, y_train)
-    y_pred = model.predict(X_test)
-    return model, vectorizer, X_test, y_test, y_pred
 
+    # Split data
+    X_train, X_test, y_train, y_test = split_data(X, y)
+
+    # Train model
+    model = train_naive_bayes(X_train, y_train)
+
+    # Predict
+    y_pred = predict_naive_bayes(model, X_test)
+
+    return model, vectorizer, X_test, y_test, y_pred
 def is_valid_text(text):
     words = re.findall(r'\w+', text)
     return len(words) >= 5 and any(len(word) > 3 for word in words)
@@ -401,3 +408,4 @@ elif selected == "Info Sistem":
         st.write("IP:", ip)
     except:
         st.write("Tidak dapat mengambil informasi jaringan.")
+
