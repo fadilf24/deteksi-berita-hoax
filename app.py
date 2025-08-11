@@ -15,7 +15,6 @@ from sklearn.naive_bayes import MultinomialNB
 from sklearn.metrics import classification_report, accuracy_score, confusion_matrix
 from streamlit_option_menu import option_menu
 from fpdf import FPDF
-import textwrap
 import firebase_admin
 from firebase_admin import credentials, db
 
@@ -26,29 +25,6 @@ from interpretation import configure_gemini, analyze_with_gemini
 from langdetect import detect_langs, DetectorFactory
 DetectorFactory.seed = 0  # agar konsisten hasil
 
-#untuk menyimmpan file dalam format pdf
-def simpan_hasil_ke_pdf(df):
-    from fpdf import FPDF
-    pdf = FPDF()
-    pdf.set_auto_page_break(auto=True, margin=10)
-    pdf.add_page()
-    pdf.set_font("Arial", size=12)
-
-    for i, row in df.iterrows():
-        pdf.cell(0, 10, f"Data {i+1}", ln=True)
-
-        # Bungkus teks agar tidak terlalu panjang
-        teks = row.get("Teks Preprocessed") or row.get("Teks Bersih") or row.get("Teks Asli")
-        teks_wrap = textwrap.fill(teks, width=90)  # lebar 90 karakter
-        pdf.multi_cell(0, 6, f"Teks Preprocessed:\n{teks_wrap}")
-
-        pdf.ln(5)
-
-    file_path = "hasil_analisis.pdf"
-    pdf.output(file_path)
-    return file_path
-
-#validasi teks bahasa indonesia
 def is_indonesian(text, min_prob=0.90):
     try:
         detections = detect_langs(text)
@@ -88,7 +64,6 @@ def read_predictions_from_firebase():
     except Exception as e:
         st.error(f"Gagal membaca data dari Firebase: {e}")
         return pd.DataFrame()
-
 
 # ✅ Sidebar Navigasi
 with st.sidebar:
@@ -205,16 +180,10 @@ if selected == "Deteksi Hoaks":
                 st.error(f"❌ Terjadi kesalahan saat menggunakan LLM:\n{e}")
 
 
-if hasil_semua:
-    df_hasil = pd.concat(hasil_semua, ignore_index=True)
-    pdf_path = simpan_hasil_ke_pdf(df_hasil)
-    with open(pdf_path, "rb") as file:
-        st.download_button(
-            label="📄 Download Hasil Analisis PDF",
-            data=file,
-            file_name="hasil_analisis.pdf",
-            mime="application/pdf"
-        )
+    if hasil_semua:
+        df_hasil = pd.concat(hasil_semua, ignore_index=True)
+        csv = df_hasil.to_csv(index=False).encode('utf-8')
+        st.download_button("⬇️ Unduh Hasil (.csv)", data=csv, file_name="hasil_deteksi_berita.csv", mime="text/csv")
 
 # ✅ Menu Dataset
 elif selected == "Dataset":
@@ -227,7 +196,7 @@ elif selected == "Preprocessing":
     st.subheader("🔧 Tahapan Preprocessing Dataset")
 
     # 1️⃣ Penambahan Atribut Label pada Dataset Detik
-    st.markdown("### 1️ Penambahan Atribut Label pada Dataset Detik")
+    st.markdown("### 1️⃣ Penambahan Atribut Label pada Dataset Detik")
     st.write("Menambahkan atribut label pada dataset detik.com.")
 
     # Tambahkan label jika belum ada
@@ -240,7 +209,7 @@ elif selected == "Preprocessing":
     # Tampilkan hasilnya
     st.dataframe(df2.head())
 
-    st.markdown("### 2 Pemilihan Atribut yang Digunakan")
+    st.markdown("### 2️ Pemilihan Atribut yang Digunakan")
     st.write("Atribut yang dipilih untuk digunakan dalam analisis adalah: `judul`, `narasi`, dan `label`.")
 
     st.subheader("📄 Dataset Kaggle")
@@ -249,10 +218,10 @@ elif selected == "Preprocessing":
     st.subheader("📄 Dataset Detik.com")
     st.dataframe(df2[["Judul", "Konten", "label"]].head())
 
-    st.markdown("### 3 Penggabungan Dataset Kaggle + Detik.com")
+    st.markdown("### Penggabungan Dataset Kaggle + Detik.com")
     st.dataframe(df[["judul", "narasi", "label"]].head(), use_container_width=True)
 
-    st.markdown("### 4. Penambahan Atribut `text` (Gabungan Judul + Narasi)")
+    st.markdown("### Penambahan Atribut `text` (Gabungan Judul + Narasi)")
     st.dataframe(df[["text"]].head(), use_container_width=True)
 
     st.markdown("### 🔎 Contoh Proses Lengkap Preprocessing")
@@ -432,19 +401,3 @@ elif selected == "Info Sistem":
         st.write("IP:", ip)
     except:
         st.write("Tidak dapat mengambil informasi jaringan.")
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
