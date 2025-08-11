@@ -24,7 +24,7 @@ from interpretation import configure_gemini, analyze_with_gemini
 
 from langdetect import detect_langs, DetectorFactory
 DetectorFactory.seed = 0  # agar konsisten hasil
-
+#validasi teks bahsa indonesia
 def is_indonesian(text, min_prob=0.90):
     try:
         detections = detect_langs(text)
@@ -401,3 +401,4 @@ elif selected == "Info Sistem":
         st.write("IP:", ip)
     except:
         st.write("Tidak dapat mengambil informasi jaringan.")
+
