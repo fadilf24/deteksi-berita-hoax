@@ -26,36 +26,41 @@ from langdetect import detect_langs, DetectorFactory
 DetectorFactory.seed = 0  # agar konsisten hasil
 
 #untuk menyimmpan file dalam format pdf
-def simpan_hasil_ke_pdf(df_hasil):
-    class PDF(FPDF):
-        def header(self):
-            self.set_font('Helvetica', 'B', 16)
-            self.cell(0, 10, 'Hasil Analisis Deteksi Berita Hoaks', ln=True, align='C')
-            self.ln(5)
-
-        def footer(self):
-            self.set_y(-15)
-            self.set_font('Helvetica', 'I', 8)
-            self.cell(0, 10, f'Halaman {self.page_no()}', align='C')
-
-    pdf = PDF()
-    pdf.set_auto_page_break(auto=True, margin=15)
+def simpan_hasil_ke_pdf(df_hasil, filename="hasil_analisis.pdf"):
+    pdf = FPDF()
     pdf.add_page()
-    pdf.set_font('Helvetica', '', 12)
+    pdf.set_font("Arial", size=12)
 
-    for i, row in df_hasil.iterrows():
-        pdf.multi_cell(0, 7, f"Berita {i+1}:", align="L")
-        pdf.multi_cell(0, 7, f"Teks Asli: {row['input_user']}", align="L")
-        pdf.multi_cell(0, 7, f"Teks Preprocessed: {row['Preprocessed']}", align="L")
-        pdf.multi_cell(0, 7, f"Hasil Klasifikasi: {row['Klasifikasi']}", align="L")
-        pdf.multi_cell(0, 7, f"Tingkat Probabilitas Hoaks: {row['Probabilitas']}%", align="L")
-        pdf.ln(5)
+    # Judul
+    pdf.cell(0, 10, "Hasil Analisis Deteksi Berita Hoaks", ln=True, align="C")
+    pdf.ln(10)
 
-    output_dir = "hasil_pdf"
-    os.makedirs(output_dir, exist_ok=True)
-    pdf_path = os.path.join(output_dir, "hasil_analisis.pdf")
-    pdf.output(pdf_path)
-    return pdf_path
+    # Tanggal
+    pdf.cell(0, 10, f"Tanggal Analisis: {datetime.now().strftime('%d-%m-%Y %H:%M')}", ln=True)
+    pdf.ln(5)
+
+    # Deskripsi ringkasan
+    total_data = len(df_hasil)
+    hoaks_count = (df_hasil['Hasil'] == "Hoaks").sum()
+    valid_count = (df_hasil['Hasil'] == "Valid").sum()
+    pdf.multi_cell(0, 8, 
+        f"Dari total {total_data} teks yang dianalisis, "
+        f"terdapat {hoaks_count} berita hoaks dan {valid_count} berita valid.\n"
+        "Detail hasil analisis dapat dilihat di bawah ini:"
+    )
+    pdf.ln(5)
+
+    # Per data
+    for idx, row in df_hasil.iterrows():
+        pdf.multi_cell(0, 8, f"{idx+1}. Teks: {row['Teks']}")
+        pdf.multi_cell(0, 8, f"   Hasil: {row['Hasil']}")
+        pdf.multi_cell(0, 8, f"   Probabilitas: {row['Probabilitas']*100:.2f}%")
+        pdf.ln(3)
+
+    # Simpan ke file
+    path_pdf = os.path.join(os.getcwd(), filename)
+    pdf.output(path_pdf)
+    return path_pdf
 
 #validasi teks bahasa indonesia
 def is_indonesian(text, min_prob=0.90):
@@ -217,11 +222,11 @@ if selected == "Deteksi Hoaks":
 if hasil_semua:
     df_hasil = pd.concat(hasil_semua, ignore_index=True)
     pdf_path = simpan_hasil_ke_pdf(df_hasil)
-    with open(pdf_path, "rb") as f:
+    with open(pdf_path, "rb") as file:
         st.download_button(
-            label="⬇️ Unduh Hasil (.pdf)",
-            data=f,
-            file_name=os.path.basename(pdf_path),
+            label="📄 Download Hasil Analisis PDF",
+            data=file,
+            file_name="hasil_analisis.pdf",
             mime="application/pdf"
         )
 
