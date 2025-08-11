@@ -32,21 +32,25 @@ def simpan_hasil_ke_pdf(df):
     pdf.add_page()
     pdf.set_font("Arial", size=12)
 
-    pdf.cell(0, 10, "Hasil Analisis Deteksi Berita Hoaks", ln=True, align='C')
-    pdf.ln(10)
+    pdf.cell(0, 10, "Hasil Analisis Berita", ln=True, align='C')
+    pdf.ln(5)
 
-    for i, row in df.iterrows():
-        pdf.multi_cell(0, 7, f"Teks Asli: {row.get('Teks Asli', '')}")
-        pdf.multi_cell(0, 7, f"Teks Preprocessed: {row.get('Preprocessed', '')}")
-        pdf.multi_cell(0, 7, f"Prediksi: {row.get('Prediksi', '')}")
-        pdf.multi_cell(0, 7, f"Probabilitas: {row.get('Probabilitas', '')}")
-        pdf.ln(5)
-        pdf.cell(0, 0, "-"*80, ln=True)
+    for idx, row in df.iterrows():
+        pdf.set_font("Arial", style='B', size=11)
+        pdf.multi_cell(0, 7, f"Berita {idx+1}")
+        pdf.set_font("Arial", size=10)
+
+        # Bungkus teks panjang agar tidak error
+        teks_pre = textwrap.fill(str(row.get("Preprocessed", "")), width=100)
+        hasil = textwrap.fill(str(row.get("Hasil", "")), width=100)
+
+        pdf.multi_cell(0, 6, f"Teks Preprocessed:\n{teks_pre}")
+        pdf.multi_cell(0, 6, f"Hasil Analisis:\n{hasil}")
         pdf.ln(5)
 
-    file_path = os.path.join(os.getcwd(), "hasil_analisis.pdf")
-    pdf.output(file_path)
-    return file_path
+    path = "/mount/data/hasil_analisis.pdf"
+    pdf.output(path)
+    return path
 
 #validasi teks bahasa indonesia
 def is_indonesian(text, min_prob=0.90):
@@ -432,6 +436,7 @@ elif selected == "Info Sistem":
         st.write("IP:", ip)
     except:
         st.write("Tidak dapat mengambil informasi jaringan.")
+
 
 
 
