@@ -26,6 +26,9 @@ from interpretation import configure_gemini, analyze_with_gemini
 from langdetect import detect_langs, DetectorFactory
 DetectorFactory.seed = 0  # agar konsisten hasil
 
+def wrap_text(teks, width=100):
+    return "\n".join(textwrap.wrap(str(teks), width=width))
+
 #untuk menyimmpan file dalam format pdf
 def simpan_hasil_ke_pdf(df):
     pdf = FPDF()
@@ -437,6 +440,7 @@ elif selected == "Info Sistem":
         st.write("IP:", ip)
     except:
         st.write("Tidak dapat mengambil informasi jaringan.")
+
 
 
 
