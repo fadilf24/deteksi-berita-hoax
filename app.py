@@ -39,7 +39,7 @@ def simpan_hasil_ke_pdf(df):
 
         # Bungkus teks agar tidak terlalu panjang
         teks = row.get("Teks Preprocessed") or row.get("Teks Bersih") or row.get("Teks Asli")
-        teks_wrap = textwrap.fill(teks_pre, width=90)  # lebar 90 karakter
+        teks_wrap = textwrap.fill(teks, width=90)  # lebar 90 karakter
         pdf.multi_cell(0, 6, f"Teks Preprocessed:\n{teks_wrap}")
 
         pdf.ln(5)
@@ -432,6 +432,7 @@ elif selected == "Info Sistem":
         st.write("IP:", ip)
     except:
         st.write("Tidak dapat mengambil informasi jaringan.")
+
 
 
 
