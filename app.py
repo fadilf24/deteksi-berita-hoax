@@ -1,29 +1,28 @@
 import streamlit as st
 import pandas as pd
 import numpy as np
-import os
-import plotly.express as px
-import plotly.figure_factory as ff
-import io
 import re
-import json
 import uuid
 from datetime import datetime
 import pytz
-from sklearn.model_selection import train_test_split
-from sklearn.naive_bayes import MultinomialNB
-from sklearn.metrics import classification_report, accuracy_score, confusion_matrix
-from streamlit_option_menu import option_menu
-from fpdf import FPDF
+import plotly.express as px
+import plotly.figure_factory as ff
+
 import firebase_admin
 from firebase_admin import credentials, db
 
 from preprocessing import preprocess_text, preprocess_dataframe, load_and_clean_data, preprocess_with_steps
-from feature_extraction import combine_text_columns, tfidf_transform
-from interpretation import configure_gemini, analyze_with_gemini
+from feature_extraction import combine_text_columns
+from interpretation import analyze_with_gemini
+from classification import prepare_and_split, train_model
+from evaluation import evaluate_model
 
 from langdetect import detect_langs, DetectorFactory
-DetectorFactory.seed = 0  # agar konsisten hasil
+from sklearn.preprocessing import LabelEncoder
+from sklearn.metrics import confusion_matrix
+
+# Deteksi bahasa konsisten
+DetectorFactory.seed = 0
 
 def is_indonesian(text, min_prob=0.90):
     try:
@@ -34,20 +33,15 @@ def is_indonesian(text, min_prob=0.90):
         return False
     except:
         return False
-        
+
 st.set_page_config(page_title="Deteksi Berita Hoaks", page_icon="🔎", layout="wide")
 
 # ✅ Konfigurasi Firebase
-firebase_cred = dict(st.secrets["FIREBASE_KEY"])
 if not firebase_admin._apps:
-    print("Initializing Firebase...")
-    firebase_cred = dict(st.secrets["FIREBASE_KEY"])
-    cred = credentials.Certificate(firebase_cred)
+    cred = credentials.Certificate(dict(st.secrets["FIREBASE_KEY"]))
     firebase_admin.initialize_app(cred, {
         'databaseURL': "https://deteksi-berita-hoaks-default-rtdb.asia-southeast1.firebasedatabase.app/"
     })
-else:
-    print("Firebase already initialized.")
 
 def simpan_ke_firebase(data):
     tz = pytz.timezone("Asia/Jakarta")
@@ -65,14 +59,14 @@ def read_predictions_from_firebase():
         st.error(f"Gagal membaca data dari Firebase: {e}")
         return pd.DataFrame()
 
-# ✅ Sidebar Navigasi
+# Sidebar
+from streamlit_option_menu import option_menu
 with st.sidebar:
     selected = option_menu(
-        menu_title=None,
-        options=["Deteksi Hoaks", "Dataset", "Preprocessing", "Evaluasi Model", "Riwayat Prediksi", "Info Sistem"],
+        None,
+        ["Deteksi Hoaks", "Dataset", "Preprocessing", "Evaluasi Model", "Riwayat Prediksi", "Info Sistem"],
         icons=["search", "folder", "tools", "bar-chart", "clock-history", "cpu"],
-        default_index=0,
-        orientation="vertical"
+        default_index=0
     )
 
 st.title("📰 Deteksi Berita Hoaks (Naive Bayes + LLM)")
@@ -81,35 +75,12 @@ st.title("📰 Deteksi Berita Hoaks (Naive Bayes + LLM)")
 def load_dataset():
     return pd.read_csv("Data_latih.csv"), pd.read_csv("detik_data.csv")
 
-@st.cache_data
-def prepare_data(df1, df2):
-    df = load_and_clean_data(df1, df2)
-    df = preprocess_dataframe(df)
-    df = combine_text_columns(df)
-    label_map = {"Hoax": 1, "Non-Hoax": 0, 1: 1, 0: 0}
-    df["label"] = df["label"].map(label_map)
-    df = df[df["label"].notna()]
-    df["label"] = df["label"].astype(int)
-    return df
-
-@st.cache_data
-def extract_features_and_model(df):
-    X, vectorizer = tfidf_transform(df["T_text"])
-    y = df["label"]
-    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
-    model = MultinomialNB().fit(X_train, y_train)
-    y_pred = model.predict(X_test)
-    return model, vectorizer, X_test, y_test, y_pred
-
-def is_valid_text(text):
-    words = re.findall(r'\w+', text)
-    return len(words) >= 5 and any(len(word) > 3 for word in words)
-
-# ✅ Load Data dan Model
+# Load data & model
 try:
     df1, df2 = load_dataset()
-    df = prepare_data(df1, df2)
-    model, vectorizer, X_test, y_test, y_pred = extract_features_and_model(df)
+    X_train, X_test, y_train, y_test, vectorizer = prepare_and_split(df1, df2)
+    model = train_model(X_train, y_train)
+    y_pred = model.predict(X_test)
 except Exception as e:
     st.error(f"Gagal memuat atau memproses data:\n{e}")
     st.stop()
@@ -217,11 +188,8 @@ elif selected == "Preprocessing":
 
     st.subheader("📄 Dataset Detik.com")
     st.dataframe(df2[["Judul", "Konten", "label"]].head())
-    
-    st.markdown("### 3️ Penyesuaian Atribut")
-    st.write("Nama-nama kolom disamakan: `Judul` → `judul`, `Isi` / `Konten` → `narasi`, dsb.")
 
-    st.markdown("### 4️ Penggabungan Dataset Kaggle + Detik.com")
+    st.markdown("### 43 Penggabungan Dataset Kaggle + Detik.com")
     st.dataframe(df[["judul", "narasi", "label"]].head(), use_container_width=True)
 
     st.markdown("### 5️ Penambahan Atribut `text` (Gabungan Judul + Narasi)")
@@ -404,6 +372,7 @@ elif selected == "Info Sistem":
         st.write("IP:", ip)
     except:
         st.write("Tidak dapat mengambil informasi jaringan.")
+
 
 
 
