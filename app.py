@@ -217,14 +217,11 @@ elif selected == "Preprocessing":
 
     st.subheader("📄 Dataset Detik.com")
     st.dataframe(df2[["Judul", "Konten", "label"]].head())
-    
-    st.markdown("### 3️ Penyesuaian Atribut")
-    st.write("Nama-nama kolom disamakan: `Judul` → `judul`, `Isi` / `Konten` → `narasi`, dsb.")
 
-    st.markdown("### 4️ Penggabungan Dataset Kaggle + Detik.com")
+    st.markdown("### Penggabungan Dataset Kaggle + Detik.com")
     st.dataframe(df[["judul", "narasi", "label"]].head(), use_container_width=True)
 
-    st.markdown("### 5️ Penambahan Atribut `text` (Gabungan Judul + Narasi)")
+    st.markdown("### Penambahan Atribut `text` (Gabungan Judul + Narasi)")
     st.dataframe(df[["text"]].head(), use_container_width=True)
 
     st.markdown("### 🔎 Contoh Proses Lengkap Preprocessing")
@@ -404,3 +401,4 @@ elif selected == "Info Sistem":
         st.write("IP:", ip)
     except:
         st.write("Tidak dapat mengambil informasi jaringan.")
+
