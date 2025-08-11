@@ -29,6 +29,9 @@ DetectorFactory.seed = 0  # agar konsisten hasil
 def wrap_text(teks, width=100):
     return "\n".join(textwrap.wrap(str(teks), width=width))
 
+def break_long_words(teks, max_len=50):
+    teks = str(teks)
+    return " ".join([teks[i:i+max_len] for i in range(0, len(teks), max_len)])
 #untuk menyimmpan file dalam format pdf
 def simpan_hasil_ke_pdf(df):
     pdf = FPDF()
@@ -440,6 +443,7 @@ elif selected == "Info Sistem":
         st.write("IP:", ip)
     except:
         st.write("Tidak dapat mengambil informasi jaringan.")
+
 
 
 
