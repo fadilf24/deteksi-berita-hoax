@@ -65,6 +65,46 @@ def read_predictions_from_firebase():
         st.error(f"Gagal membaca data dari Firebase: {e}")
         return pd.DataFrame()
 
+def simpan_hasil_ke_pdf(dataframe):
+    pdf = FPDF()
+    pdf.add_page()
+
+    # Judul
+    pdf.set_font("Arial", 'B', 16)
+    pdf.cell(0, 10, "Laporan Hasil Deteksi Hoaks", ln=True, align="C")
+    pdf.ln(5)
+
+    # Tanggal
+    pdf.set_font("Arial", '', 12)
+    pdf.cell(0, 10, f"Tanggal dibuat: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}", ln=True)
+    pdf.ln(5)
+
+    # Loop setiap baris data
+    for idx, row in dataframe.iterrows():
+        pdf.set_font("Arial", 'B', 12)
+        pdf.cell(0, 10, f"Analisis #{idx+1}", ln=True)
+
+        pdf.set_font("Arial", '', 11)
+        pdf.multi_cell(0, 7, f"Teks Asli: {row['Input']}")
+        pdf.multi_cell(0, 7, f"Teks Preprocessed: {row['Preprocessed']}")
+        pdf.cell(0, 7, f"Prediksi Model: {row['Prediksi Model']}", ln=True)
+        pdf.cell(0, 7, f"Probabilitas Non-Hoax: {row['Probabilitas Non-Hoax']}", ln=True)
+        pdf.cell(0, 7, f"Probabilitas Hoax: {row['Probabilitas Hoax']}", ln=True)
+        pdf.multi_cell(0, 7, f"Kebenaran LLM: {row['Kebenaran LLM']}")
+        pdf.multi_cell(0, 7, f"Alasan LLM: {row['Alasan LLM']}")
+        pdf.multi_cell(0, 7, f"Ringkasan Berita: {row['Ringkasan Berita']}")
+        pdf.multi_cell(0, 7, f"Perbandingan: {row['Perbandingan']}")
+        pdf.multi_cell(0, 7, f"Penjelasan Koreksi: {row['Penjelasan Koreksi']}")
+        pdf.ln(5)
+
+    # Simpan file sementara
+    filename = f"laporan_deteksi_{datetime.now().strftime('%Y%m%d_%H%M%S')}.pdf"
+    filepath = os.path.join(os.getcwd(), filename)
+    pdf.output(filepath)
+
+    return filepath
+
+
 # ✅ Sidebar Navigasi
 with st.sidebar:
     selected = option_menu(
@@ -180,10 +220,16 @@ if selected == "Deteksi Hoaks":
                 st.error(f"❌ Terjadi kesalahan saat menggunakan LLM:\n{e}")
 
 
-    if hasil_semua:
-        df_hasil = pd.concat(hasil_semua, ignore_index=True)
-        csv = df_hasil.to_csv(index=False).encode('utf-8')
-        st.download_button("⬇️ Unduh Hasil (.csv)", data=csv, file_name="hasil_deteksi_berita.csv", mime="text/csv")
+if hasil_semua:
+    df_hasil = pd.concat(hasil_semua, ignore_index=True)
+    pdf_path = simpan_hasil_ke_pdf(df_hasil)
+    with open(pdf_path, "rb") as f:
+        st.download_button(
+            label="⬇️ Unduh Hasil (.pdf)",
+            data=f,
+            file_name=os.path.basename(pdf_path),
+            mime="application/pdf"
+        )
 
 # ✅ Menu Dataset
 elif selected == "Dataset":
@@ -401,4 +447,5 @@ elif selected == "Info Sistem":
         st.write("IP:", ip)
     except:
         st.write("Tidak dapat mengambil informasi jaringan.")
+
 
