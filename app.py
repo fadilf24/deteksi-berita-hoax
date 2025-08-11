@@ -92,8 +92,10 @@ def prepare_data(df1, df2):
     df["label"] = df["label"].astype(int)
     return df
 
-@st.cache_data
-# Ekstraksi fitur
+# === Pipeline Training ===
+df = prepare_data(df1, df2)  # df1, df2 ambil dari upload atau sumber data
+
+# Ekstraksi fitur TF-IDF
 X, vectorizer = tfidf_transform(df["T_text"])
 y = df["label"]
 
@@ -103,6 +105,7 @@ X_train, X_test, y_train, y_test = split_data(X, y, test_size=0.2, random_state=
 # Latih model
 model = MultinomialNB().fit(X_train, y_train)
 y_pred = model.predict(X_test)
+
 
 # ✅ Load Data dan Model
 try:
