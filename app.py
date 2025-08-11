@@ -406,3 +406,4 @@ elif selected == "Info Sistem":
         st.write("Tidak dapat mengambil informasi jaringan.")
 
 
+
