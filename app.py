@@ -216,10 +216,50 @@ if selected == "Deteksi Hoaks":
                 st.error(f"❌ Terjadi kesalahan saat menggunakan LLM:\n{e}")
 
 
-    if hasil_semua:
-        df_hasil = pd.concat(hasil_semua, ignore_index=True)
-        csv = df_hasil.to_csv(index=False).encode('utf-8')
-        st.download_button("⬇️ Unduh Hasil (.csv)", data=csv, file_name="hasil_deteksi_berita.csv", mime="text/csv")
+if hasil_semua:
+    df_hasil = pd.concat(hasil_semua, ignore_index=True)
+    csv = df_hasil.to_csv(index=False).encode('utf-8')
+    st.download_button("⬇️ Unduh Hasil (.csv)", data=csv, file_name="hasil_deteksi_berita.csv", mime="text/csv")
+
+    # ✅ Tambahan: Download PDF
+    if st.button("⬇️ Unduh Hasil (.pdf)"):
+        class PDF(FPDF):
+            def header(self):
+                self.set_font('Arial', 'B', 16)
+                self.cell(0, 10, 'Hasil Deteksi Berita Hoaks', 0, 1, 'C')
+                self.ln(5)
+            def chapter_title(self, title):
+                self.set_font('Arial', 'B', 12)
+                self.cell(0, 10, title, 0, 1)
+            def chapter_body(self, body):
+                self.set_font('Arial', '', 11)
+                self.multi_cell(0, 8, body)
+                self.ln()
+
+        pdf = PDF()
+        pdf.add_page()
+
+        for idx, row in df_hasil.iterrows():
+            pdf.chapter_title(f"Data #{idx+1}")
+            pdf.chapter_body(f"Teks Asli:\n{row['Input']}")
+            pdf.chapter_body(f"Preprocessed:\n{row['Preprocessed']}")
+            pdf.chapter_body(f"Prediksi Model: {row['Prediksi Model']}")
+            pdf.chapter_body(f"Probabilitas Non-Hoax: {row['Probabilitas Non-Hoax']}")
+            pdf.chapter_body(f"Probabilitas Hoax: {row['Probabilitas Hoax']}")
+            pdf.chapter_body(f"Kebenaran LLM: {row.get('Kebenaran LLM', '-')}")
+            pdf.chapter_body(f"Alasan LLM:\n{row.get('Alasan LLM', '-')}")
+            pdf.chapter_body(f"Ringkasan Berita:\n{row.get('Ringkasan Berita', '-')}")
+            pdf.chapter_body(f"Perbandingan:\n{row.get('Perbandingan', '-')}")
+            pdf.chapter_body(f"Penjelasan Koreksi:\n{row.get('Penjelasan Koreksi', '-')}")
+            pdf.ln(5)
+
+        pdf_output = pdf.output(dest='S').encode('latin-1')
+        st.download_button(
+            label="📄 Download PDF",
+            data=pdf_output,
+            file_name="hasil_deteksi_berita.pdf",
+            mime="application/pdf"
+        )
 
 # ✅ Menu Dataset
 elif selected == "Dataset":
@@ -441,6 +481,7 @@ elif selected == "Info Sistem":
         st.write("IP:", ip)
     except:
         st.write("Tidak dapat mengambil informasi jaringan.")
+
 
 
 
