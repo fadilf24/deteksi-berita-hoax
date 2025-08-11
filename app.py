@@ -25,6 +25,34 @@ from interpretation import configure_gemini, analyze_with_gemini
 from langdetect import detect_langs, DetectorFactory
 DetectorFactory.seed = 0  # agar konsisten hasil
 
+#untuk menyimmpan file dalam format pdf
+def simpan_hasil_ke_pdf(df_hasil, filename="hasil_analisis.pdf"):
+    pdf = FPDF()
+    pdf.add_page()
+    pdf.set_font("Arial", size=12)
+
+    pdf.cell(200, 10, txt="Hasil Analisis Deteksi Berita Hoaks", ln=True, align="C")
+    pdf.ln(10)
+
+    # Header tabel
+    col_width = pdf.w / (len(df_hasil.columns) + 1)
+    row_height = pdf.font_size * 1.5
+
+    for col in df_hasil.columns:
+        pdf.cell(col_width, row_height, col, border=1)
+    pdf.ln(row_height)
+
+    # Isi tabel
+    for _, row in df_hasil.iterrows():
+        for item in row:
+            pdf.cell(col_width, row_height, str(item), border=1)
+        pdf.ln(row_height)
+
+    path_pdf = os.path.join(os.getcwd(), filename)
+    pdf.output(path_pdf)
+    return path_pdf
+
+#validasi teks bahasa indonesia
 def is_indonesian(text, min_prob=0.90):
     try:
         detections = detect_langs(text)
@@ -408,5 +436,6 @@ elif selected == "Info Sistem":
         st.write("IP:", ip)
     except:
         st.write("Tidak dapat mengambil informasi jaringan.")
+
 
 
