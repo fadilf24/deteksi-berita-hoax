@@ -19,7 +19,6 @@ import firebase_admin
 from firebase_admin import credentials, db
 
 from preprocessing import preprocess_text, preprocess_dataframe, load_and_clean_data, preprocess_with_steps
-from classification import split_data
 from feature_extraction import combine_text_columns, tfidf_transform
 from interpretation import configure_gemini, analyze_with_gemini
 
@@ -70,8 +69,8 @@ def read_predictions_from_firebase():
 with st.sidebar:
     selected = option_menu(
         menu_title=None,
-        options=["Deteksi Hoaks", "Dataset", "Preprocessing", "Split Data", "Evaluasi Model", "Riwayat Prediksi", "Info Sistem"],
-        icons=["search", "folder", "tools", "shuffle", "bar-chart", "clock-history", "cpu"],
+        options=["Deteksi Hoaks", "Dataset", "Preprocessing", "Evaluasi Model", "Riwayat Prediksi", "Info Sistem"],
+        icons=["search", "folder", "tools", "bar-chart", "clock-history", "cpu"],
         default_index=0,
         orientation="vertical"
     )
@@ -93,22 +92,18 @@ def prepare_data(df1, df2):
     df["label"] = df["label"].astype(int)
     return df
 
-# === Load Dataset ===
-df1, df2 = load_dataset()  # Ambil data dari CSV
-# === Pipeline Training ===
-df = prepare_data(df1, df2)  # df1, df2 ambil dari upload atau sumber data
+@st.cache_data
+def extract_features_and_model(df):
+    X, vectorizer = tfidf_transform(df["T_text"])
+    y = df["label"]
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+    model = MultinomialNB().fit(X_train, y_train)
+    y_pred = model.predict(X_test)
+    return model, vectorizer, X_test, y_test, y_pred
 
-# Ekstraksi fitur TF-IDF
-X, vectorizer = tfidf_transform(df["T_text"])
-y = df["label"]
-
-# Split data pakai fungsi dari classification.py
-X_train, X_test, y_train, y_test = split_data(X, y, test_size=0.2, random_state=42)
-
-# Latih model
-model = MultinomialNB().fit(X_train, y_train)
-y_pred = model.predict(X_test)
-
+def is_valid_text(text):
+    words = re.findall(r'\w+', text)
+    return len(words) >= 5 and any(len(word) > 3 for word in words)
 
 # ✅ Load Data dan Model
 try:
@@ -197,7 +192,6 @@ elif selected == "Dataset":
     st.subheader("Dataset Detik.com:")
     st.dataframe(df2)
 
-#menu preprocessing
 elif selected == "Preprocessing":
     st.subheader("🔧 Tahapan Preprocessing Dataset")
 
@@ -256,45 +250,6 @@ elif selected == "Preprocessing":
     st.dataframe(df_steps, use_container_width=True)
 
 
-elif selected == "Split Data":
-    st.subheader("📊 Distribusi Label pada Data Latih & Data Uji")
-
-    # Buat DataFrame label
-    df_train_labels = pd.DataFrame({"label": y_train})
-    df_test_labels = pd.DataFrame({"label": y_test})
-
-    # Hitung distribusi
-    distribusi_train = df_train_labels["label"].value_counts().reset_index()
-    distribusi_train.columns = ["Label", "Jumlah"]
-    distribusi_train["Persentase"] = (distribusi_train["Jumlah"] / len(df_train_labels) * 100).round(2)
-
-    distribusi_test = df_test_labels["label"].value_counts().reset_index()
-    distribusi_test.columns = ["Label", "Jumlah"]
-    distribusi_test["Persentase"] = (distribusi_test["Jumlah"] / len(df_test_labels) * 100).round(2)
-
-    # Mapping label angka ke teks
-    label_map = {1: "Hoax", 0: "Non-Hoax"}
-    distribusi_train["Label"] = distribusi_train["Label"].map(label_map)
-    distribusi_test["Label"] = distribusi_test["Label"].map(label_map)
-
-    st.markdown("### 📂 Data Latih")
-    st.dataframe(distribusi_train, use_container_width=True)
-
-    st.markdown("### 📂 Data Uji")
-    st.dataframe(distribusi_test, use_container_width=True)
-
-    col1, col2 = st.columns(2)
-    with col1:
-        fig_train = px.pie(distribusi_train, names="Label", values="Jumlah",
-                           title="Distribusi Label - Data Latih",
-                           color_discrete_sequence=["green", "red"])
-        st.plotly_chart(fig_train, use_container_width=True)
-
-    with col2:
-        fig_test = px.pie(distribusi_test, names="Label", values="Jumlah",
-                          title="Distribusi Label - Data Uji",
-                          color_discrete_sequence=["green", "red"])
-        st.plotly_chart(fig_test, use_container_width=True)
 
 # ✅ Menu Evaluasi Model
 elif selected == "Evaluasi Model":
@@ -446,9 +401,3 @@ elif selected == "Info Sistem":
         st.write("IP:", ip)
     except:
         st.write("Tidak dapat mengambil informasi jaringan.")
-
-
-
-
-
-
