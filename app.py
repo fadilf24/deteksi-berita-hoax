@@ -26,20 +26,17 @@ from interpretation import configure_gemini, analyze_with_gemini
 from langdetect import detect_langs, DetectorFactory
 DetectorFactory.seed = 0  # agar konsisten hasil
 
-def safe_wrap(text, width=80):
-    """Membungkus teks panjang agar tidak error di FPDF"""
+def wrap_long_text(text, max_width=80):
+    """Potong kata panjang agar tidak error di FPDF"""
     if not isinstance(text, str):
         text = str(text)
-    # Potong kata super panjang biar ada spasi setiap width karakter
     fixed_words = []
     for word in text.split():
-        if len(word) > width:
-            fixed_words.extend(textwrap.wrap(word, width))
+        if len(word) > max_width:
+            fixed_words.extend(textwrap.wrap(word, max_width))
         else:
             fixed_words.append(word)
-    wrapped_text = " ".join(fixed_words)
-    # Bungkus per baris supaya multi_cell aman
-    return "\n".join(textwrap.wrap(wrapped_text, width))
+    return "\n".join(textwrap.wrap(" ".join(fixed_words), max_width))
     
 #untuk menyimmpan file dalam format pdf
 def simpan_hasil_ke_pdf(df):
@@ -62,10 +59,10 @@ def simpan_hasil_ke_pdf(df):
 
         pdf.multi_cell(0, 6, f"Teks Preprocessed:\n{teks_pre}")
         pdf.multi_cell(0, 6, f"Hasil Analisis:\n{hasil}")
+        pdf.multi_cell(0, 7, f"Teks Preprocessed:\n{wrap_long_text(row['Preprocessed'])}")
         pdf.ln(5)
 
     path = "/mount/data/hasil_analisis.pdf"
-    pdf.multi_cell(0, 7, f"Teks Preprocessed:\n{safe_wrap(row['Preprocessed'], 80)}")
     pdf.output(path)
     return path
 
@@ -453,6 +450,7 @@ elif selected == "Info Sistem":
         st.write("IP:", ip)
     except:
         st.write("Tidak dapat mengambil informasi jaringan.")
+
 
 
 
