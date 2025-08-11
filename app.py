@@ -26,41 +26,27 @@ from langdetect import detect_langs, DetectorFactory
 DetectorFactory.seed = 0  # agar konsisten hasil
 
 #untuk menyimmpan file dalam format pdf
-def simpan_hasil_ke_pdf(df_hasil, filename="hasil_analisis.pdf"):
+def simpan_hasil_ke_pdf(df):
     pdf = FPDF()
+    pdf.set_auto_page_break(auto=True, margin=15)
     pdf.add_page()
     pdf.set_font("Arial", size=12)
 
-    # Judul
-    pdf.cell(0, 10, "Hasil Analisis Deteksi Berita Hoaks", ln=True, align="C")
+    pdf.cell(0, 10, "Hasil Analisis Deteksi Berita Hoaks", ln=True, align='C')
     pdf.ln(10)
 
-    # Tanggal
-    pdf.cell(0, 10, f"Tanggal Analisis: {datetime.now().strftime('%d-%m-%Y %H:%M')}", ln=True)
-    pdf.ln(5)
+    for i, row in df.iterrows():
+        pdf.multi_cell(0, 7, f"Teks Asli: {row.get('Teks Asli', '')}")
+        pdf.multi_cell(0, 7, f"Teks Preprocessed: {row.get('Preprocessed', '')}")
+        pdf.multi_cell(0, 7, f"Prediksi: {row.get('Prediksi', '')}")
+        pdf.multi_cell(0, 7, f"Probabilitas: {row.get('Probabilitas', '')}")
+        pdf.ln(5)
+        pdf.cell(0, 0, "-"*80, ln=True)
+        pdf.ln(5)
 
-    # Deskripsi ringkasan
-    total_data = len(df_hasil)
-    hoaks_count = (df_hasil['Hasil'] == "Hoaks").sum()
-    valid_count = (df_hasil['Hasil'] == "Valid").sum()
-    pdf.multi_cell(0, 8, 
-        f"Dari total {total_data} teks yang dianalisis, "
-        f"terdapat {hoaks_count} berita hoaks dan {valid_count} berita valid.\n"
-        "Detail hasil analisis dapat dilihat di bawah ini:"
-    )
-    pdf.ln(5)
-
-    # Per data
-    for idx, row in df_hasil.iterrows():
-        pdf.multi_cell(0, 8, f"{idx+1}. Teks: {row['Teks']}")
-        pdf.multi_cell(0, 8, f"   Hasil: {row['Hasil']}")
-        pdf.multi_cell(0, 8, f"   Probabilitas: {row['Probabilitas']*100:.2f}%")
-        pdf.ln(3)
-
-    # Simpan ke file
-    path_pdf = os.path.join(os.getcwd(), filename)
-    pdf.output(path_pdf)
-    return path_pdf
+    file_path = os.path.join(os.getcwd(), "hasil_analisis.pdf")
+    pdf.output(file_path)
+    return file_path
 
 #validasi teks bahasa indonesia
 def is_indonesian(text, min_prob=0.90):
@@ -446,6 +432,7 @@ elif selected == "Info Sistem":
         st.write("IP:", ip)
     except:
         st.write("Tidak dapat mengambil informasi jaringan.")
+
 
 
 
