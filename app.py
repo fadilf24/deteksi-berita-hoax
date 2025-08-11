@@ -45,7 +45,7 @@ def simpan_hasil_ke_pdf(df_hasil):
 
     for i, row in df_hasil.iterrows():
         pdf.multi_cell(0, 7, f"Berita {i+1}:", align="L")
-        pdf.multi_cell(0, 7, f"Teks Asli: {row['Teks']}", align="L")
+        pdf.multi_cell(0, 7, f"Teks Asli: {row['input_user']}", align="L")
         pdf.multi_cell(0, 7, f"Teks Preprocessed: {row['Preprocessed']}", align="L")
         pdf.multi_cell(0, 7, f"Hasil Klasifikasi: {row['Klasifikasi']}", align="L")
         pdf.multi_cell(0, 7, f"Tingkat Probabilitas Hoaks: {row['Probabilitas']}%", align="L")
@@ -441,6 +441,7 @@ elif selected == "Info Sistem":
         st.write("IP:", ip)
     except:
         st.write("Tidak dapat mengambil informasi jaringan.")
+
 
 
 
