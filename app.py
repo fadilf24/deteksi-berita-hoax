@@ -26,45 +26,27 @@ from interpretation import configure_gemini, analyze_with_gemini
 from langdetect import detect_langs, DetectorFactory
 DetectorFactory.seed = 0  # agar konsisten hasil
 
-def wrap_long_text(text, max_width=80):
-    """Potong kata panjang agar tidak error di FPDF"""
-    if not isinstance(text, str):
-        text = str(text)
-    fixed_words = []
-    for word in text.split():
-        if len(word) > max_width:
-            fixed_words.extend(textwrap.wrap(word, max_width))
-        else:
-            fixed_words.append(word)
-    return "\n".join(textwrap.wrap(" ".join(fixed_words), max_width))
-    
 #untuk menyimmpan file dalam format pdf
 def simpan_hasil_ke_pdf(df):
+    from fpdf import FPDF
     pdf = FPDF()
-    pdf.set_auto_page_break(auto=True, margin=15)
+    pdf.set_auto_page_break(auto=True, margin=10)
     pdf.add_page()
     pdf.set_font("Arial", size=12)
 
-    pdf.cell(0, 10, "Hasil Analisis Berita", ln=True, align='C')
-    pdf.ln(5)
+    for i, row in df.iterrows():
+        pdf.cell(0, 10, f"Data {i+1}", ln=True)
 
-    for idx, row in df.iterrows():
-        pdf.set_font("Arial", style='B', size=11)
-        pdf.multi_cell(0, 7, f"Berita {idx+1}")
-        pdf.set_font("Arial", size=10)
+        # Bungkus teks agar tidak terlalu panjang
+        teks_pre = row["Teks Preprocessed"]
+        teks_wrap = textwrap.fill(teks_pre, width=90)  # lebar 90 karakter
+        pdf.multi_cell(0, 6, f"Teks Preprocessed:\n{teks_wrap}")
 
-        # Bungkus teks panjang agar tidak error
-        teks_pre = textwrap.fill(str(row.get("Preprocessed", "")), width=100)
-        hasil = textwrap.fill(str(row.get("Hasil", "")), width=100)
-
-        pdf.multi_cell(0, 6, f"Teks Preprocessed:\n{teks_pre}")
-        pdf.multi_cell(0, 6, f"Hasil Analisis:\n{hasil}")
-        pdf.multi_cell(0, 7, f"Teks Preprocessed:\n{wrap_long_text(row['Preprocessed'])}")
         pdf.ln(5)
 
-    path = "/mount/data/hasil_analisis.pdf"
-    pdf.output(path)
-    return path
+    file_path = "hasil_analisis.pdf"
+    pdf.output(file_path)
+    return file_path
 
 #validasi teks bahasa indonesia
 def is_indonesian(text, min_prob=0.90):
@@ -450,6 +432,7 @@ elif selected == "Info Sistem":
         st.write("IP:", ip)
     except:
         st.write("Tidak dapat mengambil informasi jaringan.")
+
 
 
 
