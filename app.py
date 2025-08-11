@@ -19,6 +19,7 @@ import firebase_admin
 from firebase_admin import credentials, db
 
 from preprocessing import preprocess_text, preprocess_dataframe, load_and_clean_data, preprocess_with_steps
+form classification import split_data
 from feature_extraction import combine_text_columns, tfidf_transform
 from interpretation import configure_gemini, analyze_with_gemini
 
@@ -445,6 +446,7 @@ elif selected == "Info Sistem":
         st.write("IP:", ip)
     except:
         st.write("Tidak dapat mengambil informasi jaringan.")
+
 
 
 
