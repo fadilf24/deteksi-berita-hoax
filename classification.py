@@ -9,7 +9,7 @@ from sklearn.base import ClassifierMixin
 def split_data(
     X: Any, 
     y: Any, 
-    test_size: float = 0.8, 
+    test_size: float = 0.4, 
     random_state: int = 42
 ) -> Tuple[Any, Any, Any, Any]:
     """
