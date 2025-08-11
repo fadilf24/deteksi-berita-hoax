@@ -92,6 +92,8 @@ def prepare_data(df1, df2):
     df["label"] = df["label"].astype(int)
     return df
 
+# === Load Dataset ===
+df1, df2 = load_dataset()  # Ambil data dari CSV
 # === Pipeline Training ===
 df = prepare_data(df1, df2)  # df1, df2 ambil dari upload atau sumber data
 
@@ -443,6 +445,7 @@ elif selected == "Info Sistem":
         st.write("IP:", ip)
     except:
         st.write("Tidak dapat mengambil informasi jaringan.")
+
 
 
 
