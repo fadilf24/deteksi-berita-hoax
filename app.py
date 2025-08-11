@@ -93,17 +93,16 @@ def prepare_data(df1, df2):
     return df
 
 @st.cache_data
-def extract_features_and_model(df):
-    X, vectorizer = tfidf_transform(df["T_text"])
-    y = df["label"]
-    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
-    model = MultinomialNB().fit(X_train, y_train)
-    y_pred = model.predict(X_test)
-    return model, vectorizer, X_test, y_test, y_pred
+# Ekstraksi fitur
+X, vectorizer = tfidf_transform(df["T_text"])
+y = df["label"]
 
-def is_valid_text(text):
-    words = re.findall(r'\w+', text)
-    return len(words) >= 5 and any(len(word) > 3 for word in words)
+# Split data pakai fungsi dari classification.py
+X_train, X_test, y_train, y_test = split_data(X, y, test_size=0.2, random_state=42)
+
+# Latih model
+model = MultinomialNB().fit(X_train, y_train)
+y_pred = model.predict(X_test)
 
 # ✅ Load Data dan Model
 try:
@@ -251,22 +250,21 @@ elif selected == "Preprocessing":
     st.dataframe(df_steps, use_container_width=True)
 
 
-# ✅ Menu Split Data
 elif selected == "Split Data":
     st.subheader("📊 Distribusi Label pada Data Latih & Data Uji")
 
-    # Buat DataFrame dari data latih dan uji
-    df_train = pd.DataFrame({"label": y_train})
-    df_test = pd.DataFrame({"label": y_test})
+    # Buat DataFrame label
+    df_train_labels = pd.DataFrame({"label": y_train})
+    df_test_labels = pd.DataFrame({"label": y_test})
 
     # Hitung distribusi
-    distribusi_train = df_train["label"].value_counts().reset_index()
+    distribusi_train = df_train_labels["label"].value_counts().reset_index()
     distribusi_train.columns = ["Label", "Jumlah"]
-    distribusi_train["Persentase"] = (distribusi_train["Jumlah"] / len(df_train) * 100).round(2)
+    distribusi_train["Persentase"] = (distribusi_train["Jumlah"] / len(df_train_labels) * 100).round(2)
 
-    distribusi_test = df_test["label"].value_counts().reset_index()
+    distribusi_test = df_test_labels["label"].value_counts().reset_index()
     distribusi_test.columns = ["Label", "Jumlah"]
-    distribusi_test["Persentase"] = (distribusi_test["Jumlah"] / len(df_test) * 100).round(2)
+    distribusi_test["Persentase"] = (distribusi_test["Jumlah"] / len(df_test_labels) * 100).round(2)
 
     # Mapping label angka ke teks
     label_map = {1: "Hoax", 0: "Non-Hoax"}
@@ -279,7 +277,6 @@ elif selected == "Split Data":
     st.markdown("### 📂 Data Uji")
     st.dataframe(distribusi_test, use_container_width=True)
 
-    # Visualisasi
     col1, col2 = st.columns(2)
     with col1:
         fig_train = px.pie(distribusi_train, names="Label", values="Jumlah",
@@ -443,5 +440,6 @@ elif selected == "Info Sistem":
         st.write("IP:", ip)
     except:
         st.write("Tidak dapat mengambil informasi jaringan.")
+
 
 
