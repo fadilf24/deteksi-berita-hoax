@@ -216,10 +216,10 @@ if selected == "Deteksi Hoaks":
                 st.error(f"❌ Terjadi kesalahan saat menggunakan LLM:\n{e}")
 
 
-if hasil_semua:
-    df_hasil = pd.concat(hasil_semua, ignore_index=True)
-    csv = df_hasil.to_csv(index=False).encode('utf-8')
-    st.download_button("⬇️ Unduh Hasil (.csv)", data=csv, file_name="hasil_deteksi_berita.csv", mime="text/csv")
+    if hasil_semua:
+        df_hasil = pd.concat(hasil_semua, ignore_index=True)
+        csv = df_hasil.to_csv(index=False).encode('utf-8')
+        st.download_button("⬇️ Unduh Hasil (.csv)", data=csv, file_name="hasil_deteksi_berita.csv", mime="text/csv")
 
 # ✅ Menu Dataset
 elif selected == "Dataset":
@@ -441,6 +441,7 @@ elif selected == "Info Sistem":
         st.write("IP:", ip)
     except:
         st.write("Tidak dapat mengambil informasi jaringan.")
+
 
 
 
