@@ -123,62 +123,51 @@ except Exception as e:
 
 hasil_semua = []
 
-def show_split_data_page(df):
+def show_split_data_page(df, vectorizer):
     st.header("📊 Split Data & Distribusi Label")
 
     # Mapping label angka ke teks
-    label_mapping = {1: "Non-Hoax", 0: "Hoax"}  # sesuaikan mapping kalau perlu
+    label_mapping = {1: "Non-Hoax", 0: "Hoax"}
     df["label_text"] = df["label"].map(label_mapping)
 
     # Ambil fitur dan label teks
     X = df["T_text"]
     y = df["label_text"]
 
-    # Split data (pakai default 20% test size dari classification.py)
+    # Split data (pakai default split dari classification.py)
     X_train, X_test, y_train, y_test = split_data(X, y)
 
     # Distribusi label pada data train
     st.subheader("Distribusi Label - Data Train")
-    train_dist = y_train.value_counts().reset_index()
-    train_dist.columns = ["Label", "Jumlah"]
-    st.dataframe(train_dist)
+    st.dataframe(y_train.value_counts().reset_index().rename(columns={"index": "Label", "label_text": "Jumlah"}))
 
     # Distribusi label pada data test
     st.subheader("Distribusi Label - Data Test")
-    test_dist = y_test.value_counts().reset_index()
-    test_dist.columns = ["Label", "Jumlah"]
-    st.dataframe(test_dist)
+    st.dataframe(y_test.value_counts().reset_index().rename(columns={"index": "Label", "label_text": "Jumlah"}))
 
-    # Ringkasan total
     st.info(f"Jumlah data latih: {len(X_train)} | Jumlah data uji: {len(X_test)}")
 
-    # --- Bagian baru: Hitung total bobot TF-IDF per label ---
+    # --- Hitung total bobot TF-IDF per label di DATA UJI ---
     st.subheader("Total Bobot TF-IDF Data Uji per Label")
 
-    # Ubah X_test ke TF-IDF sparse matrix dengan vectorizer (pakai vectorizer dari context luar)
-    # Kalau vectorizer belum tersedia di sini, kamu bisa passing sebagai argumen fungsi
-    # Misal: model, vectorizer, X_test, y_test, y_pred = extract_features_and_model(df)
-    # Maka tambahkan vectorizer ke parameter fungsi atau simpan global
-
-    # Contoh asumsi vectorizer dan model sudah global (atau kamu bisa sesuaikan)
-    global vectorizer
+    # Transformasi data uji ke bentuk TF-IDF
     X_test_tfidf = vectorizer.transform(X_test)
 
-    import numpy as np
+    # Buat mask per label di data uji
+    mask_hoax = (y_test == "Hoax").values
+    mask_nonhoax = (y_test == "Non-Hoax").values
 
-    mask_hoax = (y_train == 'Hoax').values
-    mask_nonhoax = (y_train == 'Non-Hoax').values
+    # Hitung total bobot per label
+    tfidf_sum_hoax = X_test_tfidf[mask_hoax].sum()
+    tfidf_sum_nonhoax = X_test_tfidf[mask_nonhoax].sum()
 
-    tfidf_sum_hoax = X_train_tfidf[mask_hoax].sum()
-    tfidf_sum_nonhoax = X_train_tfidf[mask_nonhoax].sum()
-    jumlah_fitur_unik = X_train_tfidf.astype(bool).sum(axis=1).max()  # ini kurang tepat
+    # Hitung jumlah fitur unik di data uji
+    jumlah_fitur_unik = (X_test_tfidf.sum(axis=0) > 0).sum()
 
-    # Cara yang tepat:
-    jumlah_fitur_unik = (X_train_tfidf.sum(axis=0) > 0).sum()  # fitur yang punya bobot > 0 di data uji
+    st.write(f"Jumlah fitur unik (kata unik) di data uji: {int(jumlah_fitur_unik)}")
+    st.write(f"Total Bobot TF-IDF Data Uji untuk Label 'Hoax'    : {tfidf_sum_hoax:.4f}")
+    st.write(f"Total Bobot TF-IDF Data Uji untuk Label 'Non-Hoax': {tfidf_sum_nonhoax:.4f}")
 
-    st.write(f"Jumlah fitur unik (kata unik) yang muncul di data uji: {jumlah_fitur_unik}")
-    st.write(f"Total Bobot TF-IDF Data Uji untuk Label 'Hoax'    : {tfidf_sum_hoax}")
-    st.write(f"Total Bobot TF-IDF Data Uji untuk Label 'Non-Hoax': {tfidf_sum_nonhoax}")
 
 # ✅ Menu Deteksi Hoaks
 if selected == "Deteksi Hoaks":
