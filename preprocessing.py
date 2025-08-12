@@ -126,7 +126,7 @@ def load_and_clean_data(df1, df2):
     for col in df.select_dtypes(include="object").columns:
         df[col] = df[col].replace("?", np.nan)
 
-    df.dropna(subset=["judul", "narasi", "Label"], inplace=True)
+    df.dropna(subset=["judul", "narasi", "label"], inplace=True)
     df.reset_index(drop=True, inplace=True)
 
     return df
@@ -157,6 +157,7 @@ def preprocess_with_steps(text):
     hasil['filtering'] = filter_token_length(hasil['stemming'])
     hasil['final'] = " ".join(hasil['filtering'])
     return hasil
+
 
 
 
