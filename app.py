@@ -361,7 +361,7 @@ elif selected == "Evaluasi Model":
 
     st.subheader("Contoh Data Salah Prediksi:")
     salah = df_eval[df_eval["Hasil"] == "Salah"]
-    st.dataframe(salah.head() if not salah.empty else pd.DataFrame([{"Info": "Semua prediksi benar!"}]))
+    st.dataframe(salah[["text", "Actual", "Predicted", "Hasil"]].head() if not salah.empty else pd.DataFrame([{"Info": "Semua prediksi benar!"}]))
 
 # ✅ Menu Riwayat Prediksi
 elif selected == "Riwayat Prediksi":
@@ -468,6 +468,7 @@ elif selected == "Info Sistem":
         st.write("IP:", ip)
     except:
         st.write("Tidak dapat mengambil informasi jaringan.")
+
 
 
 
