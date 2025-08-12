@@ -171,7 +171,12 @@ def show_split_data_page(df):
 
     tfidf_sum_hoax = X_test_tfidf[mask_hoax].sum()
     tfidf_sum_nonhoax = X_test_tfidf[mask_nonhoax].sum()
+    jumlah_fitur_unik = X_test_tfidf.astype(bool).sum(axis=1).max()  # ini kurang tepat
 
+    # Cara yang tepat:
+    jumlah_fitur_unik = (X_test_tfidf.sum(axis=0) > 0).sum()  # fitur yang punya bobot > 0 di data uji
+
+    st.write(f"Jumlah fitur unik (kata unik) yang muncul di data uji: {jumlah_fitur_unik}")
     st.write(f"Total Bobot TF-IDF Data Uji untuk Label 'Hoax'    : {tfidf_sum_hoax}")
     st.write(f"Total Bobot TF-IDF Data Uji untuk Label 'Non-Hoax': {tfidf_sum_nonhoax}")
 
@@ -464,6 +469,7 @@ elif selected == "Info Sistem":
         st.write("IP:", ip)
     except:
         st.write("Tidak dapat mengambil informasi jaringan.")
+
 
 
 
