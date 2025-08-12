@@ -350,7 +350,11 @@ elif selected == "Evaluasi Model":
     )
 
     st.plotly_chart(fig_cm, use_container_width=True)
-
+    
+    st.subheader("📋 Hasil Prediksi Naive Bayes (df.head())")
+    df_eval = pd.DataFrame({"Actual": y_test, "Predicted": y_pred})
+    df_eval["Hasil"] = np.where(df_eval["Actual"] == df_eval["Predicted"], "Benar", "Salah")
+    st.dataframe(df_eval.head())  # ✅ tampilkan 5 baris pertama
     st.subheader("Visualisasi Prediksi:")
     df_eval = pd.DataFrame({"Actual": y_test, "Predicted": y_pred})
     df_eval["Hasil"] = np.where(df_eval["Actual"] == df_eval["Predicted"], "Benar", "Salah")
@@ -469,6 +473,7 @@ elif selected == "Info Sistem":
         st.write("IP:", ip)
     except:
         st.write("Tidak dapat mengambil informasi jaringan.")
+
 
 
 
