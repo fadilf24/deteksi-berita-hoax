@@ -80,7 +80,7 @@ st.title("📰 Deteksi Berita Hoaks (Naive Bayes + LLM)")
 
 @st.cache_data
 def load_dataset():
-    return pd.read_csv("Data_latih.csv"), pd.read_csv("detik.com.csv")
+    return pd.read_csv("Data_latih.csv"), pd.read_csv("detik_data_.csv")
 
 @st.cache_data
 def prepare_data(df1, df2):
@@ -441,6 +441,7 @@ elif selected == "Info Sistem":
         st.write("IP:", ip)
     except:
         st.write("Tidak dapat mengambil informasi jaringan.")
+
 
 
 
