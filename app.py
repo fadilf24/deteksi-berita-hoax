@@ -166,12 +166,12 @@ def show_split_data_page(df):
 
     import numpy as np
 
-    mask_hoax = (y_test == 'Hoax').values
-    mask_nonhoax = (y_test == 'Non-Hoax').values
+    mask_hoax = (y_train == 'Hoax').values
+    mask_nonhoax = (y_train == 'Non-Hoax').values
 
-    tfidf_sum_hoax = X_test_tfidf[mask_hoax].sum()
-    tfidf_sum_nonhoax = X_test_tfidf[mask_nonhoax].sum()
-    jumlah_fitur_unik = X_test_tfidf.astype(bool).sum(axis=1).max()  # ini kurang tepat
+    tfidf_sum_hoax = X_train_tfidf[mask_hoax].sum()
+    tfidf_sum_nonhoax = X_train_tfidf[mask_nonhoax].sum()
+    jumlah_fitur_unik = X_train_tfidf.astype(bool).sum(axis=1).max()  # ini kurang tepat
 
     # Cara yang tepat:
     jumlah_fitur_unik = (X_train_tfidf.sum(axis=0) > 0).sum()  # fitur yang punya bobot > 0 di data uji
@@ -478,4 +478,5 @@ elif selected == "Info Sistem":
         st.write("IP:", ip)
     except:
         st.write("Tidak dapat mengambil informasi jaringan.")
+
 
