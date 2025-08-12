@@ -256,7 +256,7 @@ elif selected == "Preprocessing":
     st.dataframe(df1[["judul", "narasi", "label"]].head())
 
     st.subheader("📄 Dataset Detik.com")
-    st.dataframe(df2[["judul", "narsi", "label"]].head())
+    st.dataframe(df2[["judul", "narasi", "label"]].head())
 
     st.markdown("### Penggabungan Dataset Kaggle + Detik.com")
     st.dataframe(df[["judul", "narasi", "label"]].head(), use_container_width=True)
@@ -441,6 +441,7 @@ elif selected == "Info Sistem":
         st.write("IP:", ip)
     except:
         st.write("Tidak dapat mengambil informasi jaringan.")
+
 
 
 
