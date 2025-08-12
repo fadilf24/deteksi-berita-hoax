@@ -101,15 +101,15 @@ def load_and_clean_data(df1, df2):
     else:
         df2['label'] = df2['label'].fillna('Non-Hoax')
 
-    df2 = df2.rename(columns={
-        "Judul": "judul",
-        "Isi": "narasi",
-        "Konten": "narasi",
-        "T_judul": "judul",
-        "T_isi": "narasi",
-        "T_label": "label",
-        "Label": "label"
-    })
+    #df2 = df2.rename(columns={
+    #    "Judul": "judul",
+    #    "Isi": "narasi",
+    #    "Konten": "narasi",
+    #    "T_judul": "judul",
+    #    "T_isi": "narasi",
+    #    "T_label": "label",
+    #    "Label": "label"
+    #})
 
     expected_cols = ["judul", "narasi", "label"]
     df2 = df2[[col for col in expected_cols if col in df2.columns]]
@@ -157,3 +157,4 @@ def preprocess_with_steps(text):
     hasil['filtering'] = filter_token_length(hasil['stemming'])
     hasil['final'] = " ".join(hasil['filtering'])
     return hasil
+
