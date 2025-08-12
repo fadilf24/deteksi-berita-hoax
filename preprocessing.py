@@ -97,9 +97,9 @@ def load_and_clean_data(df1, df2):
     """
 
     if 'label' not in df2.columns:
-        df2['label'] = 'Non-Hoax'
+        df2['Label'] = 'Non-Hoax'
     else:
-        df2['label'] = df2['label'].fillna('Non-Hoax')
+        df2['Label'] = df2['Label'].fillna('Non-Hoax')
 
     #df2 = df2.rename(columns={
     #    "Judul": "judul",
@@ -111,7 +111,7 @@ def load_and_clean_data(df1, df2):
     #    "Label": "label"
     #})
 
-    expected_cols = ["judul", "narasi", "label"]
+    expected_cols = ["judul", "narasi", "Label"]
     df2 = df2[[col for col in expected_cols if col in df2.columns]]
     df1 = df1[[col for col in expected_cols if col in df1.columns]]
 
@@ -126,7 +126,7 @@ def load_and_clean_data(df1, df2):
     for col in df.select_dtypes(include="object").columns:
         df[col] = df[col].replace("?", np.nan)
 
-    df.dropna(subset=["judul", "narasi", "label"], inplace=True)
+    df.dropna(subset=["judul", "narasi", "Label"], inplace=True)
     df.reset_index(drop=True, inplace=True)
 
     return df
@@ -157,4 +157,5 @@ def preprocess_with_steps(text):
     hasil['filtering'] = filter_token_length(hasil['stemming'])
     hasil['final'] = " ".join(hasil['filtering'])
     return hasil
+
 
