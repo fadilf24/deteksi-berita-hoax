@@ -246,7 +246,7 @@ elif selected == "Dataset":
     st.dataframe(df2)
 
 elif selected == "Split Data":
-    show_split_data_page(df)
+    show_split_data_page(df, vectorizer)
 
 # menu preprocessing
 elif selected == "Preprocessing":
@@ -467,5 +467,6 @@ elif selected == "Info Sistem":
         st.write("IP:", ip)
     except:
         st.write("Tidak dapat mengambil informasi jaringan.")
+
 
 
