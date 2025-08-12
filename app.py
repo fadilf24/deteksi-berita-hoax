@@ -87,7 +87,7 @@ def prepare_data(df1, df2):
     df = load_and_clean_data(df1, df2)
     df = preprocess_dataframe(df)
     df = combine_text_columns(df)
-    label_map = {"Hoax": 1, "Non-Hoax": 0, 1: 1, 0: 0}
+    label_map = {"Hoax": 0, "Non-Hoax": 1}
     df["label"] = df["label"].map(label_map)
     df = df[df["label"].notna()]
     df["label"] = df["label"].astype(int)
@@ -478,6 +478,7 @@ elif selected == "Info Sistem":
         st.write("IP:", ip)
     except:
         st.write("Tidak dapat mengambil informasi jaringan.")
+
 
 
 
