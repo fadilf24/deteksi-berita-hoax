@@ -127,7 +127,7 @@ def show_split_data_page(df):
     st.header("📊 Split Data & Distribusi Label")
 
     # Mapping label angka ke teks
-    label_mapping = {1: "non-hoax", 0: "hoax"}
+    label_mapping = {1: "Non-Hoax", 0: "Hoax"}  # sesuaikan mapping kalau perlu
     df["label_text"] = df["label"].map(label_mapping)
 
     # Ambil fitur dan label teks
@@ -151,6 +151,29 @@ def show_split_data_page(df):
 
     # Ringkasan total
     st.info(f"Jumlah data latih: {len(X_train)} | Jumlah data uji: {len(X_test)}")
+
+    # --- Bagian baru: Hitung total bobot TF-IDF per label ---
+    st.subheader("Total Bobot TF-IDF Data Uji per Label")
+
+    # Ubah X_test ke TF-IDF sparse matrix dengan vectorizer (pakai vectorizer dari context luar)
+    # Kalau vectorizer belum tersedia di sini, kamu bisa passing sebagai argumen fungsi
+    # Misal: model, vectorizer, X_test, y_test, y_pred = extract_features_and_model(df)
+    # Maka tambahkan vectorizer ke parameter fungsi atau simpan global
+
+    # Contoh asumsi vectorizer dan model sudah global (atau kamu bisa sesuaikan)
+    global vectorizer
+    X_test_tfidf = vectorizer.transform(X_test)
+
+    import numpy as np
+
+    mask_hoax = (y_test == 'Hoax').values
+    mask_nonhoax = (y_test == 'Non-Hoax').values
+
+    tfidf_sum_hoax = X_test_tfidf[mask_hoax].sum()
+    tfidf_sum_nonhoax = X_test_tfidf[mask_nonhoax].sum()
+
+    st.write(f"Total Bobot TF-IDF Data Uji untuk Label 'Hoax'    : {tfidf_sum_hoax}")
+    st.write(f"Total Bobot TF-IDF Data Uji untuk Label 'Non-Hoax': {tfidf_sum_nonhoax}")
 
 # ✅ Menu Deteksi Hoaks
 if selected == "Deteksi Hoaks":
@@ -441,6 +464,7 @@ elif selected == "Info Sistem":
         st.write("IP:", ip)
     except:
         st.write("Tidak dapat mengambil informasi jaringan.")
+
 
 
 
