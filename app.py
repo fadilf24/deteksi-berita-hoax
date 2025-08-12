@@ -360,8 +360,7 @@ elif selected == "Evaluasi Model":
     df_eval["Hasil"] = np.where(df_eval["Actual"] == df_eval["Predicted"], "Benar", "Salah")
     hasil_count = df_eval["Hasil"].value_counts().reset_index()
     hasil_count.columns = ["Hasil", "Jumlah"]
-    fig_eval = px.pie(hasil_count, names="Hasil", values="Jumlah", title="Distribusi Prediksi Benar vs Salah",
-                      color_discrete_sequence=px.colors.sequential.RdBu)
+    fig_eval = px.pie(hasil_count, names="Hasil", values="Jumlah", title="Distribusi Prediksi Benar vs Salah",color_discrete_sequence=px.colors.sequential.RdBu)
     st.plotly_chart(fig_eval, use_container_width=True)
 
     st.subheader("Contoh Data Salah Prediksi:")
@@ -473,6 +472,7 @@ elif selected == "Info Sistem":
         st.write("IP:", ip)
     except:
         st.write("Tidak dapat mengambil informasi jaringan.")
+
 
 
 
