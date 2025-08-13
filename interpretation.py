@@ -28,7 +28,6 @@ Tugas Anda:
 
 Prediksi model Naive Bayes untuk berita ini: {predicted_label}
 {distribusi_str}
-Kebenaran : {kebenaran_val}
 
 Teks Berita:
 {text}
@@ -85,6 +84,7 @@ Teks Berita:
         "perbandingan_kebenaran": perbandingan,
         "penjelasan_koreksi": penjelasan_koreksi
     }
+
 
 
 
