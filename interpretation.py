@@ -26,9 +26,9 @@ Tugas Anda:
 2. Jelaskan secara singkat mengapa Anda menilai demikian. Jika Anda menggunakan referensi atau sumber, sebutkan secara umum saja tanpa mencantumkan link. Jawaban diawali dengan: "Alasan: ..."
 3. Buat ringkasan isi berita maksimal dalam 5 kalimat. Jawaban diawali dengan: "Ringkasan: ..."
 
-Label Asli: {label_asli}
 Prediksi model Naive Bayes untuk berita ini: {predicted_label}
 {distribusi_str}
+Kebenaran : {kebenaran_val}
 
 Teks Berita:
 {text}
@@ -85,5 +85,6 @@ Teks Berita:
         "perbandingan_kebenaran": perbandingan,
         "penjelasan_koreksi": penjelasan_koreksi
     }
+
 
 
