@@ -209,6 +209,7 @@ if selected == "Deteksi Hoaks":
                     distribution={"Non-Hoax": f"{probas[0]*100:.1f}",
                                   "Hoax": f"{probas[1]*100:.1f}"}
                 )
+                with st.spinner("Memproses LLM...")
                 with st.expander("Hasil Interpretasi LLM"):
                     st.write(result.get('output_mentah', 'Tidak tersedia'))
 
@@ -467,6 +468,7 @@ elif selected == "Info Sistem":
         st.write("IP:", ip)
     except:
         st.write("Tidak dapat mengambil informasi jaringan.")
+
 
 
 
