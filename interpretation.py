@@ -33,7 +33,7 @@ Teks Berita:
 {text}
 """
 
-    model = genai.GenerativeModel("gemini-2.5-pro")
+    model = genai.GenerativeModel("gemini-2.0-pro")
     response = model.generate_content(prompt)
     response_text = response.text.strip()
 
@@ -84,6 +84,7 @@ Teks Berita:
         "perbandingan_kebenaran": perbandingan,
         "penjelasan_koreksi": penjelasan_koreksi
     }
+
 
 
 
