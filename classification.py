@@ -7,16 +7,16 @@ from sklearn.base import ClassifierMixin
 
 
 def split_data(
-    X: Any, 
-    y: Any, 
+    X: np.ndarray, 
+    y: np.ndarray, 
     test_size: float = 0.2, 
     random_state: int = 42
-) -> Tuple[Any, Any, Any, Any]:
+) -> Tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
     """
     Membagi dataset menjadi data latih dan data uji.
 
     Args:
-        X: Matriks fitur (contoh: hasil TF-IDF)
+        X: Matriks fitur (contoh: hasil TF-IDF dalam bentuk dense array)
         y: Label target
         test_size: Proporsi data uji (default 0.2)
         random_state: Nilai seed untuk pengacakan
@@ -27,12 +27,12 @@ def split_data(
     return train_test_split(X, y, test_size=test_size, random_state=random_state)
 
 
-def train_naive_bayes(X_train: Any, y_train: Any) -> GaussianNB:
+def train_naive_bayes(X_train: np.ndarray, y_train: np.ndarray) -> GaussianNB:
     """
-    Melatih model klasifikasi Naive Bayes (MultinomialNB).
+    Melatih model klasifikasi Naive Bayes (GaussianNB).
 
     Args:
-        X_train: Fitur latih
+        X_train: Fitur latih (dense array)
         y_train: Label latih
 
     Returns:
@@ -46,13 +46,13 @@ def train_naive_bayes(X_train: Any, y_train: Any) -> GaussianNB:
     return model
 
 
-def predict_naive_bayes(model: ClassifierMixin, X_test: Any) -> np.ndarray:
+def predict_naive_bayes(model: ClassifierMixin, X_test: np.ndarray) -> np.ndarray:
     """
     Melakukan prediksi menggunakan model Naive Bayes.
 
     Args:
         model: Model klasifikasi yang telah dilatih
-        X_test: Fitur data uji
+        X_test: Fitur data uji (dense array)
 
     Returns:
         Array hasil prediksi label
@@ -87,10 +87,3 @@ def prediction_distribution(
         for label, count in zip(unique, counts)
     }
     return percentages
-
-
-
-
-
-
-
