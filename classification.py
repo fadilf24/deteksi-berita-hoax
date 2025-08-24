@@ -1,5 +1,5 @@
 import numpy as np
-from sklearn.naive_bayes import MultinomialNB
+from sklearn.naive_bayes import GaussianNB
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import LabelEncoder
 from typing import Tuple, Dict, Any
@@ -41,7 +41,7 @@ def train_naive_bayes(X_train: Any, y_train: Any) -> MultinomialNB:
     if X_train.shape[0] == 0 or y_train.shape[0] == 0:
         raise ValueError("Data latih kosong, tidak bisa melatih model.")
     
-    model = MultinomialNB()
+    model = GaussianNB()
     model.fit(X_train, y_train)
     return model
 
@@ -87,6 +87,7 @@ def prediction_distribution(
         for label, count in zip(unique, counts)
     }
     return percentages
+
 
 
 
