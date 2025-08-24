@@ -27,7 +27,7 @@ def split_data(
     return train_test_split(X, y, test_size=test_size, random_state=random_state)
 
 
-def train_naive_bayes(X_train: Any, y_train: Any) -> MultinomialNB:
+def train_naive_bayes(X_train: Any, y_train: Any) -> GaussianNB:
     """
     Melatih model klasifikasi Naive Bayes (MultinomialNB).
 
@@ -87,6 +87,7 @@ def prediction_distribution(
         for label, count in zip(unique, counts)
     }
     return percentages
+
 
 
 
