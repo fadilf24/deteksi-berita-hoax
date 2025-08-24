@@ -95,8 +95,27 @@ def prepare_data(df1, df2):
 
 @st.cache_data
 def extract_features_and_model(df):
+    """
+    Mengekstrak fitur teks menggunakan TF-IDF dan melatih model Gaussian Naive Bayes.
+
+    Args:
+        df: DataFrame yang memiliki kolom 'T_text' (teks) dan 'label' (target)
+
+    Returns:
+        model: Model Gaussian Naive Bayes yang telah dilatih
+        vectorizer: Objek TfidfVectorizer
+        X_test: Data uji (dense array)
+        y_test: Label uji
+        y_pred: Prediksi dari model
+    """
+    # Transformasi teks menjadi fitur TF-IDF
     X, vectorizer = tfidf_transform(df["T_text"])
-    y = df["label"]
+    
+    # Konversi sparse matrix ke dense array
+    X = X.toarray()
+    
+    # Ambil label
+    y = df["label"].values
 
     # Split data
     X_train, X_test, y_train, y_test = split_data(X, y)
@@ -108,9 +127,24 @@ def extract_features_and_model(df):
     y_pred = predict_naive_bayes(model, X_test)
 
     return model, vectorizer, X_test, y_test, y_pred
+
+
 def is_valid_text(text):
+    """
+    Memvalidasi apakah teks layak diproses.
+    Kriteria:
+    - Minimal 5 kata
+    - Ada minimal satu kata dengan panjang > 3 karakter
+
+    Args:
+        text: Teks input
+
+    Returns:
+        True jika valid, False jika tidak
+    """
     words = re.findall(r'\w+', text)
     return len(words) >= 5 and any(len(word) > 3 for word in words)
+
 
 # ✅ Load Data dan Model
 try:
@@ -467,6 +501,7 @@ elif selected == "Info Sistem":
         st.write("IP:", ip)
     except:
         st.write("Tidak dapat mengambil informasi jaringan.")
+
 
 
 
