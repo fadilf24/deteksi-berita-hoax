@@ -113,8 +113,9 @@ def prepare_data(df1, df2):
 
 @st.cache_data
 def extract_features_and_model(df):
+    # Transformasi TF-IDF
     X, vectorizer = tfidf_transform(df["T_text"])
-    X = X.toarray()
+    X = X.toarray()  # ubah ke dense agar kompatibel dengan GaussianNB
     y = df["label"].values
 
     X_train, X_test, y_train, y_test = split_data(X, y)
@@ -122,7 +123,6 @@ def extract_features_and_model(df):
     y_pred = predict_naive_bayes(model, X_test)
 
     return model, vectorizer, X_test, y_test, y_pred
-
 # ✅ Load Data dan Model
 try:
     df1, df2 = load_dataset()
@@ -133,8 +133,6 @@ try:
 except Exception as e:
     st.error(f"Gagal memuat atau memproses data:\n{e}")
     st.stop()
-
-hasil_semua = []
 
 # ✅ Halaman Split Data
 def show_split_data_page(df, vectorizer):
@@ -181,12 +179,12 @@ if selected == "Deteksi Hoaks":
         else:
             with st.spinner("Memproses teks dan memprediksi..."):
                 processed = preprocess_text(user_input)
-                vectorized = vectorizer.transform([processed])
+                vectorized = vectorizer.transform([processed]).toarray()  # ubah ke dense
                 prediction = model.predict(vectorized)[0]
-                probas = model.predict_proba(vectorized)[0]
+                probas = model.predict_proba(vectorized)[0]  # GaussianNB mendukung predict_proba
                 label_map = {1: "Non-Hoax", 0: "Hoax"}
                 pred_label = label_map[prediction]
-
+                
             st.success(f"Prediksi: **{pred_label}**")
 
             st.subheader("Keyakinan Model:")
@@ -283,3 +281,4 @@ elif selected == "Riwayat Prediksi":
         st.download_button("⬇️ Unduh Riwayat (.csv)", data=csv_data, file_name="riwayat_prediksi_firebase.csv", mime="text/csv")
     else:
         st.info("Belum ada data prediksi yang disimpan.")
+
