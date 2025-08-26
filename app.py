@@ -40,16 +40,17 @@ def is_valid_text(text):
 st.set_page_config(page_title="Deteksi Berita Hoaks", page_icon="🔎", layout="wide")
 
 # ✅ Konfigurasi Firebase
-firebase_cred = st.secrets["FIREBASE_KEY"]
+firebase_cred = dict(st.secrets["FIREBASE_KEY"])
 if not firebase_admin._apps:
-    try:
-        cred = credentials.Certificate(firebase_cred)
-        firebase_admin.initialize_app(cred, {
-            'databaseURL': "https://deteksiberitahoaks-default-rtdb.firebaseio.com"
-        })
-    except Exception as e:
-        st.error(f"Gagal inisialisasi Firebase: {e}")
-
+    print("Initializing Firebase...")
+    firebase_cred = dict(st.secrets["FIREBASE_KEY"])
+    cred = credentials.Certificate(firebase_cred)
+    firebase_admin.initialize_app(cred, {
+        'databaseURL': "https://deteksiberitahoaks-default-rtdb.firebaseio.com"
+    })
+else:
+    print("Firebase already initialized.")
+    
 def simpan_ke_firebase(data):
     try:
         tz = pytz.timezone("Asia/Jakarta")
@@ -277,5 +278,6 @@ elif selected == "Riwayat Prediksi":
         st.download_button("⬇️ Unduh Riwayat (.csv)", data=csv_data, file_name="riwayat_prediksi_firebase.csv", mime="text/csv")
     else:
         st.info("Belum ada data prediksi yang disimpan.")
+
 
 
