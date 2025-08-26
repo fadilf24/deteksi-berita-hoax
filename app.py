@@ -1,27 +1,23 @@
 import streamlit as st
 import pandas as pd
 import numpy as np
-import os
 import plotly.express as px
 import plotly.figure_factory as ff
-import io
 import re
-import json
 import uuid
 from datetime import datetime
 import pytz
 from sklearn.metrics import classification_report, accuracy_score, confusion_matrix
 from streamlit_option_menu import option_menu
-from fpdf import FPDF
 import firebase_admin
 from firebase_admin import credentials, db
 from langdetect import detect_langs, DetectorFactory
 
 # Import modul custom
-from preprocessing import preprocess_text, preprocess_dataframe, load_and_clean_data, preprocess_with_steps
+from preprocessing import preprocess_text, preprocess_dataframe, load_and_clean_data
 from feature_extraction import combine_text_columns, tfidf_transform
 from classification import split_data, train_naive_bayes, predict_naive_bayes
-from interpretation import configure_gemini, analyze_with_gemini
+from interpretation import analyze_with_gemini
 
 DetectorFactory.seed = 0  # agar hasil deteksi bahasa konsisten
 
@@ -117,10 +113,11 @@ def extract_features_and_model(df):
     y = df["label"].values
 
     X_train, X_test, y_train, y_test = split_data(X, y)
-    model = train_naive_bayes(X_train, y_train)  # pastikan train pakai array dense
-    y_pred = predict_naive_bayes(model, X_test)
+    model = train_naive_bayes(X_train, y_train)
+    y_pred, _ = predict_naive_bayes(model, X_test)  # ✅ adaptasi classification.py terbaru
 
     return model, vectorizer, X_test, y_test, y_pred
+
 # ✅ Load Data dan Model
 try:
     df1, df2 = load_dataset()
@@ -178,12 +175,11 @@ if selected == "Deteksi Hoaks":
             st.warning("❌ Teks harus ditulis dalam Bahasa Indonesia.")
         else:
             with st.spinner("Memproses teks dan memprediksi..."):
-                    processed = preprocess_text(user_input)
-                    vectorized = vectorizer.transform([processed]).toarray()  # ✅ ubah ke dense
-                    prediction = model.predict(vectorized)[0]
-                    probas = model.predict_proba(vectorized)[0]
-                    label_map = {1: "Non-Hoax", 0: "Hoax"}
-                    pred_label = label_map[prediction]
+                processed = preprocess_text(user_input)
+                vectorized = vectorizer.transform([processed]).toarray()  # ✅ ubah ke dense
+                prediction, probas = model.predict(vectorized)[0], model.predict_proba(vectorized)[0]
+                label_map = {1: "Non-Hoax", 0: "Hoax"}
+                pred_label = label_map[prediction]
 
             st.success(f"Prediksi: **{pred_label}**")
 
@@ -244,12 +240,12 @@ elif selected == "Evaluasi Model":
     st.metric(label="Akurasi", value=f"{acc*100:.2f}%")
 
     st.subheader("Laporan Klasifikasi:")
-    report = classification_report(y_test, y_pred, target_names=["Non-Hoax", "Hoax"], zero_division=0)
+    report = classification_report(y_test, y_pred, target_names=["Hoax", "Non-Hoax"], zero_division=0)
     st.text(report)
 
     st.subheader("Confusion Matrix:")
     cm = confusion_matrix(y_test, y_pred)
-    labels = ["Non-Hoax", "Hoax"]
+    labels = ["Hoax", "Non-Hoax"]
     z = cm
     z_text = [[str(y) for y in x] for x in z]
     fig_cm = ff.create_annotated_heatmap(z, x=labels, y=labels, annotation_text=z_text, colorscale="Blues")
@@ -281,4 +277,3 @@ elif selected == "Riwayat Prediksi":
         st.download_button("⬇️ Unduh Riwayat (.csv)", data=csv_data, file_name="riwayat_prediksi_firebase.csv", mime="text/csv")
     else:
         st.info("Belum ada data prediksi yang disimpan.")
-
