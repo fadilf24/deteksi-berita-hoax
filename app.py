@@ -211,10 +211,7 @@ if selected == "Deteksi Hoaks":
                     if result.get("penjelasan_koreksi"):
                         with st.expander("🔎 Penjelasan Koreksi LLM"):
                             st.write(result["penjelasan_koreksi"])
-                    
-                    with st.expander("📄 Output Mentah Gemini"):
-                        st.text(result.get("output_mentah", "Tidak ada"))
-
+                            
             # 🔒 Simpan hasil ke Firebase
             hasil_baru = {
                 "Input": user_input,
@@ -297,6 +294,7 @@ elif selected == "Riwayat Prediksi":
         st.download_button("⬇️ Unduh Riwayat (.csv)", data=csv_data, file_name="riwayat_prediksi_firebase.csv", mime="text/csv")
     else:
         st.info("Belum ada data prediksi yang disimpan.")
+
 
 
 
