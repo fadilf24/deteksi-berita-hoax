@@ -113,15 +113,14 @@ def prepare_data(df1, df2):
 def extract_features_and_model(df):
     # Transformasi TF-IDF
     X, vectorizer = tfidf_transform(df["T_text"])
-    X = X.toarray()  # GaussianNB butuh dense array
+    X = X.toarray()  # ✅ GaussianNB butuh dense array
     y = df["label"].values
 
     X_train, X_test, y_train, y_test = split_data(X, y)
-    model = train_naive_bayes(X_train, y_train)
+    model = train_naive_bayes(X_train, y_train)  # pastikan train pakai array dense
     y_pred = predict_naive_bayes(model, X_test)
 
     return model, vectorizer, X_test, y_test, y_pred
-
 # ✅ Load Data dan Model
 try:
     df1, df2 = load_dataset()
@@ -179,12 +178,12 @@ if selected == "Deteksi Hoaks":
             st.warning("❌ Teks harus ditulis dalam Bahasa Indonesia.")
         else:
             with st.spinner("Memproses teks dan memprediksi..."):
-                processed = preprocess_text(user_input)
-                vectorized = vectorizer.transform([processed]).toarray()  # ubah ke dense
-                prediction = model.predict(vectorized)[0]
-                probas = model.predict_proba(vectorized)[0]
-                label_map = {1: "Non-Hoax", 0: "Hoax"}
-                pred_label = label_map[prediction]
+                    processed = preprocess_text(user_input)
+                    vectorized = vectorizer.transform([processed]).toarray()  # ✅ ubah ke dense
+                    prediction = model.predict(vectorized)[0]
+                    probas = model.predict_proba(vectorized)[0]
+                    label_map = {1: "Non-Hoax", 0: "Hoax"}
+                    pred_label = label_map[prediction]
 
             st.success(f"Prediksi: **{pred_label}**")
 
@@ -282,3 +281,4 @@ elif selected == "Riwayat Prediksi":
         st.download_button("⬇️ Unduh Riwayat (.csv)", data=csv_data, file_name="riwayat_prediksi_firebase.csv", mime="text/csv")
     else:
         st.info("Belum ada data prediksi yang disimpan.")
+
