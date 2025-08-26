@@ -1,89 +1,51 @@
-import numpy as np
 from sklearn.naive_bayes import GaussianNB
-from sklearn.model_selection import train_test_split
-from sklearn.preprocessing import LabelEncoder
-from typing import Tuple, Dict, Any
-from sklearn.base import ClassifierMixin
-
-
-def split_data(
-    X: np.ndarray, 
-    y: np.ndarray, 
-    test_size: float = 0.2, 
-    random_state: int = 42
-) -> Tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
-    """
-    Membagi dataset menjadi data latih dan data uji.
-
-    Args:
-        X: Matriks fitur (contoh: hasil TF-IDF dalam bentuk dense array)
-        y: Label target
-        test_size: Proporsi data uji (default 0.2)
-        random_state: Nilai seed untuk pengacakan
-
-    Returns:
-        Tuple berisi X_train, X_test, y_train, y_test
-    """
-    return train_test_split(X, y, test_size=test_size, random_state=random_state)
+from sklearn.metrics import accuracy_score
+import numpy as np
 
 
 def train_naive_bayes(X_train: np.ndarray, y_train: np.ndarray) -> GaussianNB:
     """
-    Melatih model klasifikasi Naive Bayes (GaussianNB).
-
-    Args:
-        X_train: Fitur latih (dense array)
-        y_train: Label latih
-
-    Returns:
-        Model Naive Bayes yang telah dilatih
-    """
-    if X_train.shape[0] == 0 or y_train.shape[0] == 0:
-        raise ValueError("Data latih kosong, tidak bisa melatih model.")
+    Melatih model Gaussian Naive Bayes dengan data training.
     
+    Parameters:
+        X_train (np.ndarray): Fitur data training (dense array).
+        y_train (np.ndarray): Label data training.
+    
+    Returns:
+        GaussianNB: Model Naive Bayes yang sudah terlatih.
+    """
     model = GaussianNB()
     model.fit(X_train, y_train)
     return model
 
 
-def predict_naive_bayes(model: ClassifierMixin, X_test: np.ndarray) -> np.ndarray:
+def predict_naive_bayes(model: GaussianNB, X_test: np.ndarray):
     """
-    Melakukan prediksi menggunakan model Naive Bayes.
-
-    Args:
-        model: Model klasifikasi yang telah dilatih
-        X_test: Fitur data uji (dense array)
-
-    Returns:
-        Array hasil prediksi label
-    """
-    if X_test.shape[0] == 0:
-        raise ValueError("Data uji kosong, tidak bisa melakukan prediksi.")
+    Melakukan prediksi menggunakan model Gaussian Naive Bayes.
     
-    return model.predict(X_test)
-
-
-def prediction_distribution(
-    y_pred: np.ndarray, 
-    label_encoder: LabelEncoder
-) -> Dict[str, float]:
-    """
-    Menghitung distribusi hasil prediksi dalam persentase tiap kelas.
-
-    Args:
-        y_pred: Array hasil prediksi (label numerik)
-        label_encoder: LabelEncoder untuk mengembalikan label asli
-
+    Parameters:
+        model (GaussianNB): Model Naive Bayes yang sudah dilatih.
+        X_test (np.ndarray): Fitur data uji (dense array).
+    
     Returns:
-        Dictionary berisi label asli dan persentase kemunculannya
+        tuple: 
+            - y_pred (np.ndarray): Label hasil prediksi.
+            - y_prob (np.ndarray): Probabilitas prediksi untuk tiap kelas.
     """
-    if y_pred.size == 0:
-        return {"empty": 0.0}
+    y_pred = model.predict(X_test)
+    y_prob = model.predict_proba(X_test)
+    return y_pred, y_prob
 
-    unique, counts = np.unique(y_pred, return_counts=True)
-    total = len(y_pred)
-    percentages = {
-        label_encoder.inverse_transform([label])[0]: round((count / total) * 100, 2)
-        for label, count in zip(unique, counts)
-    }
-    return percentages
+
+def evaluate_model(y_test: np.ndarray, y_pred: np.ndarray) -> float:
+    """
+    Mengevaluasi akurasi model berdasarkan data uji.
+    
+    Parameters:
+        y_test (np.ndarray): Label sebenarnya.
+        y_pred (np.ndarray): Label hasil prediksi model.
+    
+    Returns:
+        float: Nilai akurasi (0 - 1).
+    """
+    return accuracy_score(y_test, y_pred)
