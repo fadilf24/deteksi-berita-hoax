@@ -188,7 +188,10 @@ if selected == "Deteksi Hoaks":
             st.success(f"Prediksi: **{pred_label}**")
 
             st.subheader("Keyakinan Model:")
-            df_proba = pd.DataFrame({"Label": ["Non-Hoax", "Hoax"], "Probabilitas": probas})
+            df_proba = pd.DataFrame({
+                "Label": ["Non-Hoax", "Hoax"],
+                "Probabilitas": probas
+            })
             fig = px.pie(
                 df_proba, names="Label", values="Probabilitas",
                 title="Distribusi Probabilitas Prediksi",
@@ -214,17 +217,15 @@ if selected == "Deteksi Hoaks":
             # ✅ Tampilkan hasil interpretasi LLM
             if result:
                 with st.expander("📖 Interpretasi LLM (Gemini)", expanded=True):
-                    if result.get("kebenaran"):
-                        st.markdown(f"**Hasil Analisis LLM:** {result['kebenaran']}")
-                    if result.get("alasan"):
-                        st.markdown(f"**Alasan:** {result['alasan']}")
-                    if result.get("ringkasan"):
-                        st.markdown(f"**Ringkasan Berita:** {result['ringkasan']}")
-                    if result.get("perbandingan_kebenaran"):
-                        st.markdown(f"**Perbandingan dengan Model:** {result['perbandingan_kebenaran']}")
+                    st.markdown(f"**Hasil Analisis LLM:** {result.get('kebenaran', 'Tidak tersedia')}")
+                    st.markdown(f"**Alasan:** {result.get('alasan', 'Tidak tersedia')}")
+                    st.markdown(f"**Ringkasan Berita:** {result.get('ringkasan', 'Tidak tersedia')}")
+                    st.markdown(f"**Perbandingan dengan Model:** {result.get('perbandingan_kebenaran', 'Tidak tersedia')}")
+                    
                     if result.get("penjelasan_koreksi"):
                         with st.expander("🔎 Penjelasan Koreksi LLM"):
                             st.write(result["penjelasan_koreksi"])
+                    
                     with st.expander("📄 Output Mentah Gemini"):
                         st.text(result.get("output_mentah", "Tidak ada"))
 
@@ -310,6 +311,7 @@ elif selected == "Riwayat Prediksi":
         st.download_button("⬇️ Unduh Riwayat (.csv)", data=csv_data, file_name="riwayat_prediksi_firebase.csv", mime="text/csv")
     else:
         st.info("Belum ada data prediksi yang disimpan.")
+
 
 
 
