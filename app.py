@@ -45,7 +45,7 @@ if not firebase_admin._apps:
     try:
         cred = credentials.Certificate(firebase_cred)
         firebase_admin.initialize_app(cred, {
-            'databaseURL': "https://deteksi-berita-hoaks-default-rtdb.asia-southeast1.firebasedatabase.app/"
+            'databaseURL': "https://deteksi-hoaks-streamlit-default-rtdb.asia-southeast1.firebasedatabase.app/"
         })
     except Exception as e:
         st.error(f"Gagal inisialisasi Firebase: {e}")
@@ -277,3 +277,4 @@ elif selected == "Riwayat Prediksi":
         st.download_button("⬇️ Unduh Riwayat (.csv)", data=csv_data, file_name="riwayat_prediksi_firebase.csv", mime="text/csv")
     else:
         st.info("Belum ada data prediksi yang disimpan.")
+
