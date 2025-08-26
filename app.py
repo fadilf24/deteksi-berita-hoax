@@ -185,6 +185,8 @@ if selected == "Deteksi Hoaks":
                 label_map = {0: "Non-Hoax", 1: "Hoax"}
                 pred_label = label_map[prediction]
 
+            st.success(f"Prediksi: **{pred_label}**")
+
             # 🔎 Analisis dengan LLM (Gemini)
             try:
                 result = analyze_with_gemini(
@@ -294,6 +296,7 @@ elif selected == "Riwayat Prediksi":
         st.download_button("⬇️ Unduh Riwayat (.csv)", data=csv_data, file_name="riwayat_prediksi_firebase.csv", mime="text/csv")
     else:
         st.info("Belum ada data prediksi yang disimpan.")
+
 
 
 
