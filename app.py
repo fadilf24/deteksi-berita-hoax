@@ -165,7 +165,10 @@ def show_split_data_page(df, vectorizer):
 # ✅ Menu Deteksi Hoaks
 if selected == "Deteksi Hoaks":
     st.subheader("Masukkan Teks Berita:")
-    user_input = st.text_area("Contoh: Pemerintah mengumumkan vaksin palsu beredar di Jakarta...", height=200)
+    user_input = st.text_area(
+        "Contoh: Pemerintah mengumumkan vaksin palsu beredar di Jakarta...",
+        height=200
+    )
 
     if st.button("Analisis Berita"):
         if not user_input.strip():
@@ -186,23 +189,46 @@ if selected == "Deteksi Hoaks":
 
             st.subheader("Keyakinan Model:")
             df_proba = pd.DataFrame({"Label": ["Non-Hoax", "Hoax"], "Probabilitas": probas})
-            fig = px.pie(df_proba, names="Label", values="Probabilitas",
-                         title="Distribusi Probabilitas Prediksi",
-                         color_discrete_sequence=["green", "red"])
+            fig = px.pie(
+                df_proba, names="Label", values="Probabilitas",
+                title="Distribusi Probabilitas Prediksi",
+                color_discrete_sequence=["green", "red"]
+            )
             st.plotly_chart(fig, use_container_width=True)
 
+            # 🔎 Analisis dengan LLM (Gemini)
             try:
                 result = analyze_with_gemini(
                     text=user_input,
                     predicted_label=pred_label,
                     used_links=[],
-                    distribution={"Non-Hoax": f"{probas[1]*100:.1f}",
-                                  "Hoax": f"{probas[0]*100:.1f}"}
+                    distribution={
+                        "Non-Hoax": f"{probas[1]*100:.1f}",
+                        "Hoax": f"{probas[0]*100:.1f}"
+                    }
                 )
             except Exception:
                 st.warning("LLM gagal dianalisis, hanya menampilkan hasil Naive Bayes.")
                 result = {}
 
+            # ✅ Tampilkan hasil interpretasi LLM
+            if result:
+                with st.expander("📖 Interpretasi LLM (Gemini)", expanded=True):
+                    if result.get("kebenaran"):
+                        st.markdown(f"**Hasil Analisis LLM:** {result['kebenaran']}")
+                    if result.get("alasan"):
+                        st.markdown(f"**Alasan:** {result['alasan']}")
+                    if result.get("ringkasan"):
+                        st.markdown(f"**Ringkasan Berita:** {result['ringkasan']}")
+                    if result.get("perbandingan_kebenaran"):
+                        st.markdown(f"**Perbandingan dengan Model:** {result['perbandingan_kebenaran']}")
+                    if result.get("penjelasan_koreksi"):
+                        with st.expander("🔎 Penjelasan Koreksi LLM"):
+                            st.write(result["penjelasan_koreksi"])
+                    with st.expander("📄 Output Mentah Gemini"):
+                        st.text(result.get("output_mentah", "Tidak ada"))
+
+            # 🔒 Simpan hasil ke Firebase
             hasil_baru = {
                 "Input": user_input,
                 "Preprocessed": processed,
@@ -223,8 +249,14 @@ if selected == "Deteksi Hoaks":
     if hasil_semua:
         df_hasil = pd.concat(hasil_semua, ignore_index=True)
         csv = df_hasil.to_csv(index=False).encode('utf-8')
-        st.download_button("⬇️ Unduh Hasil (.csv)", data=csv, file_name="hasil_deteksi_berita.csv", mime="text/csv")
+        st.download_button(
+            "⬇️ Unduh Hasil (.csv)", 
+            data=csv, 
+            file_name="hasil_deteksi_berita.csv", 
+            mime="text/csv"
+        )
 
+#Menu dataset
 elif selected == "Dataset":
     st.subheader("Dataset Kaggle:")
     st.dataframe(df1)
@@ -278,6 +310,7 @@ elif selected == "Riwayat Prediksi":
         st.download_button("⬇️ Unduh Riwayat (.csv)", data=csv_data, file_name="riwayat_prediksi_firebase.csv", mime="text/csv")
     else:
         st.info("Belum ada data prediksi yang disimpan.")
+
 
 
 
