@@ -100,7 +100,7 @@ def prepare_data(df1, df2):
     df = load_and_clean_data(df1, df2)
     df = preprocess_dataframe(df)
     df = combine_text_columns(df)
-    label_map = {"Hoax": 0, "Non-Hoax": 1, 1: 1, 0: 0}
+    label_map = {"Hoax": 1, "Non-Hoax": 0, 1: 1, 0: 0}
     df["label"] = df["label"].map(label_map)
     df = df[df["label"].notna()]
     df["label"] = df["label"].astype(int)
@@ -182,22 +182,8 @@ if selected == "Deteksi Hoaks":
                 processed = preprocess_text(user_input)
                 vectorized = vectorizer.transform([processed]).toarray()  # ✅ ubah ke dense
                 prediction, probas = model.predict(vectorized)[0], model.predict_proba(vectorized)[0]
-                label_map = {1: "Non-Hoax", 0: "Hoax"}
+                label_map = {0: "Non-Hoax", 1: "Hoax"}
                 pred_label = label_map[prediction]
-
-            st.success(f"Prediksi: **{pred_label}**")
-
-            st.subheader("Keyakinan Model:")
-            df_proba = pd.DataFrame({
-                "Label": ["Non-Hoax", "Hoax"],
-                "Probabilitas": probas
-            })
-            fig = px.pie(
-                df_proba, names="Label", values="Probabilitas",
-                title="Distribusi Probabilitas Prediksi",
-                color_discrete_sequence=["green", "red"]
-            )
-            st.plotly_chart(fig, use_container_width=True)
 
             # 🔎 Analisis dengan LLM (Gemini)
             try:
@@ -311,6 +297,7 @@ elif selected == "Riwayat Prediksi":
         st.download_button("⬇️ Unduh Riwayat (.csv)", data=csv_data, file_name="riwayat_prediksi_firebase.csv", mime="text/csv")
     else:
         st.info("Belum ada data prediksi yang disimpan.")
+
 
 
 
