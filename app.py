@@ -77,7 +77,7 @@ with st.sidebar:
     selected = option_menu(
         menu_title=None,
         options=["Deteksi Hoaks", "Dataset", "Split Data", "Preprocessing", "Evaluasi Model", "Riwayat Prediksi", "Info Sistem"],
-        icons=["search", "folder", "shuffle", "tools", "bar-chart", "clock-history", "cpu"],
+        icons=["search", "clock-history"],
         default_index=0,
         orientation="vertical"
     )
@@ -296,6 +296,7 @@ elif selected == "Riwayat Prediksi":
         st.download_button("⬇️ Unduh Riwayat (.csv)", data=csv_data, file_name="riwayat_prediksi_firebase.csv", mime="text/csv")
     else:
         st.info("Belum ada data prediksi yang disimpan.")
+
 
 
 
