@@ -76,7 +76,7 @@ def read_predictions_from_firebase():
 with st.sidebar:
     selected = option_menu(
         menu_title=None,
-        options=["Deteksi Hoaks", "Evaluasi","Riwayat Prediksi"],
+        options=["Deteksi Hoaks", "Evaluasi Model","Riwayat Prediksi"],
         icons=["search", "clock-history"],
         default_index=0,
         orientation="vertical"
@@ -296,6 +296,7 @@ elif selected == "Riwayat Prediksi":
         st.download_button("⬇️ Unduh Riwayat (.csv)", data=csv_data, file_name="riwayat_prediksi_firebase.csv", mime="text/csv")
     else:
         st.info("Belum ada data prediksi yang disimpan.")
+
 
 
 
